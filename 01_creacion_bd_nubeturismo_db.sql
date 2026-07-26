@@ -41,7 +41,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- 1. Tabla de ROLES, para definir los permisos de los usuarios (Admin, cliente) y si estan activos
 -- ============================================================
 CREATE TABLE roles (
-    id_rol INT AUTO_INCREMENT, --ID, se genera automáticamente
+    id_rol INT AUTO_INCREMENT, -- ID, se genera automáticamente
     nombre VARCHAR(255) NOT NULL,
     descripcion VARCHAR(255) NULL,
     estado TINYINT(1) NOT NULL DEFAULT 1, -- 1 = activo, 0 = inactivo
