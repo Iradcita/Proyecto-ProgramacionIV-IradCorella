@@ -49,7 +49,7 @@ class AuthService
         if (Usuario::existeCorreo($correo)) {
             throw new Exception('Ese correo ya está registrado.');
         }
-
+//aqui es donde se hace el hash de la contraseña antes de guardarla en la base de datos
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
         return Usuario::crear($nombre, $apellidos, $correo, $telefono, $passwordHash);
