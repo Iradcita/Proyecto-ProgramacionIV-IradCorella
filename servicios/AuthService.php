@@ -6,7 +6,8 @@ class AuthService
     public function login($correo, $password)
     {
         $usuario = Usuario::buscarPorCorreo($correo);
-
+    //password_verify compara la contraseña ingresada con el hash almacenado en la base de datos
+    //esta funcion la trae php
         if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
             throw new Exception('Correo o contraseña incorrectos.');
         }

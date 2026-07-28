@@ -41,7 +41,7 @@ class Usuario
         // El registro publico siempre crea clientes (id_rol = 2)
         $sql = "INSERT INTO usuarios (id_rol, nombre, apellidos, correo, telefono, password_hash, estado)
                 VALUES (2, :nombre, :apellidos, :correo, :telefono, :password_hash, 'activo')";
-
+        //No corremos el riesgo de inyeccion SQL porque primero nos preparamos
         $stmt = $conexion->prepare($sql);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':apellidos', $apellidos);

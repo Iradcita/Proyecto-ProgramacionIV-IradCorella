@@ -24,6 +24,8 @@ class AuthController
 
     public function procesarLogin()
     {
+        //si un usuario manda algo que no sea post, lo redirigimos al login
+        //evitamos que un usuario pueda acceder a este metodo desde la url
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirigir('/login.php');
         }
