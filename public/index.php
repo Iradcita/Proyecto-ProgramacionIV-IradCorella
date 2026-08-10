@@ -40,6 +40,10 @@ require BASE_PATH . '/vistas/layouts/header.php';
                 <strong>Reservaciones</strong>
                 <span>Crear, confirmar, editar o cancelar reservas.</span>
             </a>
+            <a href="<?php echo BASE_URL; ?>/admin_reportes.php">
+                <strong>Reportes</strong>
+                <span>Revisar indicadores, ingresos y datos externos.</span>
+            </a>
         </div>
     <?php else: ?>
         <!-- Accesos principales del cliente para consultar y reservar. -->

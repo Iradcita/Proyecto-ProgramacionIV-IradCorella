@@ -26,13 +26,16 @@ require_once BASE_PATH . '/modelos/Destino.php';
 require_once BASE_PATH . '/modelos/Hotel.php';
 require_once BASE_PATH . '/modelos/Actividad.php';
 require_once BASE_PATH . '/modelos/Reservacion.php';
+require_once BASE_PATH . '/modelos/Reporte.php';
 require_once BASE_PATH . '/servicios/AuthService.php';
+require_once BASE_PATH . '/servicios/ApiService.php';
 require_once BASE_PATH . '/controladores/AuthController.php';
 require_once BASE_PATH . '/controladores/AdminDestinoController.php';
 require_once BASE_PATH . '/controladores/AdminHotelController.php';
 require_once BASE_PATH . '/controladores/AdminActividadController.php';
 require_once BASE_PATH . '/controladores/AdminUsuarioController.php';
 require_once BASE_PATH . '/controladores/AdminReservacionController.php';
+require_once BASE_PATH . '/controladores/AdminReporteController.php';
 require_once BASE_PATH . '/controladores/ClienteController.php';
 
 if (session_status() === PHP_SESSION_NONE) {
