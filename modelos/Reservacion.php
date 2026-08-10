@@ -58,6 +58,60 @@ class Reservacion
         return $stmt->fetchAll();
     }
 
+    // Obtiene una reservacion del usuario conectado con datos de hotel y destino.
+    public static function obtenerDetallePorUsuario($idReservacion, $idUsuario)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "SELECT r.*,
+                       rh.cantidad_habitaciones,
+                       rh.precio_noche_aplicado,
+                       rh.subtotal AS subtotal_hotel,
+                       h.nombre AS hotel_nombre,
+                       h.direccion AS hotel_direccion,
+                       h.telefono AS hotel_telefono,
+                       d.nombre AS destino_nombre
+                FROM reservaciones r
+                LEFT JOIN reservacion_hotel rh ON rh.id_reservacion = r.id_reservacion
+                LEFT JOIN hoteles h ON h.id_hotel = rh.id_hotel
+                LEFT JOIN destinos d ON d.id_destino = h.id_destino
+                WHERE r.id_reservacion = :id_reservacion
+                  AND r.id_usuario = :id_usuario";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_reservacion', $idReservacion);
+        $stmt->bindParam(':id_usuario', $idUsuario);
+        $stmt->execute();
+
+        $fila = $stmt->fetch();
+
+        return $fila ? $fila : null;
+    }
+
+    // Lista las actividades detalladas de una reservacion del usuario conectado.
+    public static function listarActividadesDetallePorUsuario($idReservacion, $idUsuario)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "SELECT ra.*,
+                       a.nombre AS actividad_nombre,
+                       d.nombre AS destino_nombre
+                FROM reservacion_actividad ra
+                INNER JOIN reservaciones r ON r.id_reservacion = ra.id_reservacion
+                INNER JOIN actividades a ON a.id_actividad = ra.id_actividad
+                INNER JOIN destinos d ON d.id_destino = a.id_destino
+                WHERE ra.id_reservacion = :id_reservacion
+                  AND r.id_usuario = :id_usuario
+                ORDER BY ra.fecha_hora ASC";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_reservacion', $idReservacion);
+        $stmt->bindParam(':id_usuario', $idUsuario);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
     // Obtiene los datos principales de una reservacion.
     public static function obtenerPorId($idReservacion)
     {

@@ -52,6 +52,8 @@ class AuthController
                 'nombre' => $usuario['nombre'],
                 'apellidos' => $usuario['apellidos'],
                 'correo' => $usuario['correo'],
+                'telefono' => $usuario['telefono'],
+                'foto_url' => $usuario['foto_url'],
                 'id_rol' => $usuario['id_rol'],
                 'rol_nombre' => $usuario['rol_nombre'],
             );

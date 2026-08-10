@@ -161,12 +161,250 @@ class ClienteController
         require BASE_PATH . '/vistas/cliente/mis_reservaciones.php';
     }
 
+    // Muestra el detalle de una reservacion propia del cliente.
+    public function detalleReservacion()
+    {
+        exigirAutenticacion();
+
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+        $idReservacion = obtenerEntero($_GET['id'] ?? 0);
+        $reservacion = Reservacion::obtenerDetallePorUsuario($idReservacion, $idUsuario);
+
+        if (!$reservacion) {
+            guardarMensaje('error', 'La reservacion solicitada no existe.');
+            $this->redirigir('/mis_reservaciones.php');
+        }
+
+        $actividades = Reservacion::listarActividadesDetallePorUsuario($idReservacion, $idUsuario);
+        $mensajes = obtenerMensajes();
+        $tituloPagina = 'Detalle de reservacion - NubeTurismo';
+
+        require BASE_PATH . '/vistas/cliente/reservacion_detalle.php';
+    }
+
+    // Muestra el perfil editable del usuario conectado.
+    public function mostrarPerfil()
+    {
+        exigirAutenticacion();
+
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+        $usuario = Usuario::obtenerPorId($idUsuario);
+        $mensajes = obtenerMensajes();
+        $csrfToken = generarTokenCsrf();
+        $tituloPagina = 'Mi perfil - NubeTurismo';
+
+        require BASE_PATH . '/vistas/cliente/perfil.php';
+    }
+
+    // Actualiza los datos personales del usuario conectado.
+    public function actualizarPerfil()
+    {
+        exigirAutenticacion();
+        $this->validarPostPerfil();
+
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+        $nombre = trim($_POST['nombre'] ?? '');
+        $apellidos = trim($_POST['apellidos'] ?? '');
+        $correo = trim($_POST['correo'] ?? '');
+        $telefono = trim($_POST['telefono'] ?? '');
+
+        try {
+            if ($nombre === '' || $apellidos === '') {
+                throw new Exception('Nombre y apellidos son obligatorios.');
+            }
+
+            if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception('El correo electronico no es valido.');
+            }
+
+            $usuarioExistente = Usuario::buscarPorCorreo($correo);
+            if ($usuarioExistente && (int) $usuarioExistente['id_usuario'] !== $idUsuario) {
+                throw new Exception('Ese correo ya esta registrado.');
+            }
+
+            Usuario::actualizarPerfil($idUsuario, $nombre, $apellidos, $correo, $telefono);
+            $this->actualizarSesionPerfil($idUsuario);
+            guardarMensaje('exito', 'Perfil actualizado correctamente.');
+        } catch (Exception $e) {
+            guardarMensaje('error', $e->getMessage());
+        }
+
+        $this->redirigir('/perfil.php');
+    }
+
+    // Cambia la contrasena del usuario validando primero la actual.
+    public function cambiarPassword()
+    {
+        exigirAutenticacion();
+        $this->validarPostPerfil();
+
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+        $passwordActual = $_POST['password_actual'] ?? '';
+        $passwordNueva = $_POST['password_nueva'] ?? '';
+        $confirmacion = $_POST['password_confirmacion'] ?? '';
+
+        try {
+            $usuario = Usuario::obtenerPorId($idUsuario);
+
+            if (!$usuario || !password_verify($passwordActual, $usuario['password_hash'])) {
+                throw new Exception('La contrasena actual no es correcta.');
+            }
+
+            if ($passwordNueva !== $confirmacion) {
+                throw new Exception('Las contrasenas no coinciden.');
+            }
+
+            $this->validarPassword($passwordNueva);
+            Usuario::actualizarPassword($idUsuario, password_hash($passwordNueva, PASSWORD_BCRYPT));
+            guardarMensaje('exito', 'Contrasena actualizada correctamente.');
+        } catch (Exception $e) {
+            guardarMensaje('error', $e->getMessage());
+        }
+
+        $this->redirigir('/perfil.php');
+    }
+
+    // Sube una nueva fotografia o elimina la fotografia actual.
+    public function guardarFoto()
+    {
+        exigirAutenticacion();
+        $this->validarPostPerfil();
+
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+
+        try {
+            if (!empty($_POST['eliminar_foto'])) {
+                $this->eliminarArchivoFotoActual($idUsuario);
+                Usuario::actualizarFoto($idUsuario, null);
+                $this->actualizarSesionPerfil($idUsuario);
+                guardarMensaje('exito', 'Fotografia eliminada correctamente.');
+                $this->redirigir('/perfil.php');
+            }
+
+            if (empty($_FILES['foto']['name'])) {
+                throw new Exception('Debes seleccionar una fotografia.');
+            }
+
+            if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('No se pudo subir la fotografia.');
+            }
+
+            if ($_FILES['foto']['size'] > 2097152) {
+                throw new Exception('La fotografia no debe superar 2 MB.');
+            }
+
+            $mime = $this->obtenerMimeArchivo($_FILES['foto']['tmp_name']);
+            $extensiones = array('image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp');
+
+            if (!isset($extensiones[$mime])) {
+                throw new Exception('Solo se permiten imagenes JPG, PNG o WEBP.');
+            }
+
+            $directorio = BASE_PATH . '/public/uploads/perfiles';
+            if (!is_dir($directorio)) {
+                mkdir($directorio, 0775, true);
+            }
+
+            $nombreArchivo = 'usuario_' . $idUsuario . '_' . time() . '.' . $extensiones[$mime];
+            $rutaDestino = $directorio . '/' . $nombreArchivo;
+
+            if (!move_uploaded_file($_FILES['foto']['tmp_name'], $rutaDestino)) {
+                throw new Exception('No se pudo guardar la fotografia.');
+            }
+
+            $this->eliminarArchivoFotoActual($idUsuario);
+            Usuario::actualizarFoto($idUsuario, 'uploads/perfiles/' . $nombreArchivo);
+            $this->actualizarSesionPerfil($idUsuario);
+            guardarMensaje('exito', 'Fotografia actualizada correctamente.');
+        } catch (Exception $e) {
+            guardarMensaje('error', $e->getMessage());
+        }
+
+        $this->redirigir('/perfil.php');
+    }
+
     // Verifica fechas recibidas en formato YYYY-MM-DD.
     private function fechaEsValida($fecha)
     {
         $partes = explode('-', $fecha);
 
         return count($partes) === 3 && checkdate((int) $partes[1], (int) $partes[2], (int) $partes[0]);
+    }
+
+    // Valida la fortaleza minima de la nueva contrasena.
+    private function validarPassword($password)
+    {
+        if (strlen($password) < 8 || !preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+            throw new Exception('La contrasena debe tener al menos 8 caracteres, con letras y numeros.');
+        }
+    }
+
+    // Valida metodo POST y token CSRF para formularios del perfil.
+    private function validarPostPerfil()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirigir('/perfil.php');
+        }
+
+        if (!validarTokenCsrf($_POST['csrf_token'] ?? '')) {
+            guardarMensaje('error', 'El formulario expiro. Intenta nuevamente.');
+            $this->redirigir('/perfil.php');
+        }
+    }
+
+    // Refresca en sesion los datos que aparecen en la navegacion.
+    private function actualizarSesionPerfil($idUsuario)
+    {
+        $usuario = Usuario::obtenerPorId($idUsuario);
+
+        if (!$usuario) {
+            return;
+        }
+
+        $_SESSION['usuario']['nombre'] = $usuario['nombre'];
+        $_SESSION['usuario']['apellidos'] = $usuario['apellidos'];
+        $_SESSION['usuario']['correo'] = $usuario['correo'];
+        $_SESSION['usuario']['telefono'] = $usuario['telefono'];
+        $_SESSION['usuario']['foto_url'] = $usuario['foto_url'];
+        $_SESSION['usuario']['rol_nombre'] = $usuario['rol_nombre'];
+    }
+
+    // Detecta el tipo real del archivo subido.
+    private function obtenerMimeArchivo($rutaTemporal)
+    {
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $rutaTemporal);
+            finfo_close($finfo);
+
+            return $mime;
+        }
+
+        if (function_exists('mime_content_type')) {
+            return mime_content_type($rutaTemporal);
+        }
+
+        return '';
+    }
+
+    // Elimina del disco la foto local anterior si pertenece a la carpeta permitida.
+    private function eliminarArchivoFotoActual($idUsuario)
+    {
+        $usuario = Usuario::obtenerPorId($idUsuario);
+
+        if (!$usuario || empty($usuario['foto_url'])) {
+            return;
+        }
+
+        if (strpos($usuario['foto_url'], 'uploads/perfiles/') !== 0) {
+            return;
+        }
+
+        $ruta = BASE_PATH . '/public/' . $usuario['foto_url'];
+
+        if (is_file($ruta)) {
+            unlink($ruta);
+        }
     }
 
     // Redirige dentro de la carpeta publica del proyecto.

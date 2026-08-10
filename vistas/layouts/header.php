@@ -30,6 +30,7 @@ $usuarioSesion = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
                     <a href="<?php echo BASE_URL; ?>/reservar.php">Reservar</a>
                     <a href="<?php echo BASE_URL; ?>/mis_reservaciones.php">Mis reservas</a>
                 <?php endif; ?>
+                <a href="<?php echo BASE_URL; ?>/perfil.php">Perfil</a>
                 <a href="<?php echo BASE_URL; ?>/logout.php">Cerrar sesión</a>
             <?php else: ?>
                 <a href="<?php echo BASE_URL; ?>/login.php">Iniciar sesión</a>

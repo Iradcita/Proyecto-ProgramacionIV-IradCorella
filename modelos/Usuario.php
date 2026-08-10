@@ -167,6 +167,39 @@ class Usuario
         $stmt->execute();
     }
 
+    // Actualiza los datos personales que el usuario puede editar desde su perfil.
+    public static function actualizarPerfil($idUsuario, $nombre, $apellidos, $correo, $telefono)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "UPDATE usuarios
+                SET nombre = :nombre,
+                    apellidos = :apellidos,
+                    correo = :correo,
+                    telefono = :telefono
+                WHERE id_usuario = :id_usuario";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':apellidos', $apellidos);
+        $stmt->bindParam(':correo', $correo);
+        $stmt->bindParam(':telefono', $telefono);
+        $stmt->bindParam(':id_usuario', $idUsuario);
+        $stmt->execute();
+    }
+
+    // Guarda o elimina la ruta de la fotografia del usuario.
+    public static function actualizarFoto($idUsuario, $fotoUrl)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "UPDATE usuarios SET foto_url = :foto_url WHERE id_usuario = :id_usuario";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':foto_url', $fotoUrl);
+        $stmt->bindParam(':id_usuario', $idUsuario);
+        $stmt->execute();
+    }
+
     // Cambia el estado para activar, inactivar o bloquear cuentas.
     public static function actualizarEstado($idUsuario, $estado)
     {

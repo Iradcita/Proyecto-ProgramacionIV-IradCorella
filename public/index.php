@@ -64,6 +64,10 @@ require BASE_PATH . '/vistas/layouts/header.php';
                 <strong>Mis reservas</strong>
                 <span>Revisa el estado y total de tus reservaciones.</span>
             </a>
+            <a href="<?php echo BASE_URL; ?>/perfil.php">
+                <strong>Mi perfil</strong>
+                <span>Actualiza datos, foto y contrasena.</span>
+            </a>
         </div>
     <?php endif; ?>
 </section>

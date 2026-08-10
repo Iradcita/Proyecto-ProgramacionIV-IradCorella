@@ -4,4 +4,9 @@
 require dirname(__DIR__) . '/config/config.php';
 
 $controlador = new ClienteController();
-$controlador->misReservaciones();
+
+if (isset($_GET['accion']) && $_GET['accion'] === 'detalle') {
+    $controlador->detalleReservacion();
+} else {
+    $controlador->misReservaciones();
+}
