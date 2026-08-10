@@ -17,6 +17,13 @@ $usuarioSesion = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
         <nav class="cabecera__nav">
             <?php if ($usuarioSesion !== null): ?>
                 <span class="cabecera__saludo">Hola, <?php echo htmlspecialchars($usuarioSesion['nombre'], ENT_QUOTES); ?></span>
+                <?php if (esAdministrador()): ?>
+                    <a href="<?php echo BASE_URL; ?>/admin_destinos.php">Destinos</a>
+                    <a href="<?php echo BASE_URL; ?>/admin_hoteles.php">Hoteles</a>
+                    <a href="<?php echo BASE_URL; ?>/admin_actividades.php">Actividades</a>
+                    <a href="<?php echo BASE_URL; ?>/admin_usuarios.php">Usuarios</a>
+                    <a href="<?php echo BASE_URL; ?>/admin_reservaciones.php">Reservaciones</a>
+                <?php endif; ?>
                 <a href="<?php echo BASE_URL; ?>/logout.php">Cerrar sesión</a>
             <?php else: ?>
                 <a href="<?php echo BASE_URL; ?>/login.php">Iniciar sesión</a>

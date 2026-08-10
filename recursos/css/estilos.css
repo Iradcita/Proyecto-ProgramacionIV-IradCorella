@@ -94,14 +94,28 @@ body {
     font-size: 0.9rem;
 }
 
-.campo input {
+.campo input,
+.campo select,
+.campo textarea,
+.filtros input,
+.filtros select {
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--color-borde);
     border-radius: 6px;
     font-size: 1rem;
+    font-family: inherit;
 }
 
-.campo input:focus {
+.campo textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus,
+.filtros input:focus,
+.filtros select:focus {
     outline: none;
     border-color: var(--color-primario);
     box-shadow: 0 0 0 3px rgba(13, 110, 110, 0.15);
@@ -131,6 +145,12 @@ body {
 
 .boton--primario:hover {
     background-color: var(--color-primario-oscuro);
+}
+
+.boton--compacto {
+    width: auto;
+    padding: 0.55rem 0.9rem;
+    text-decoration: none;
 }
 
 .enlace-secundario {
@@ -184,6 +204,176 @@ body {
     padding: 2rem;
 }
 
+.admin-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.admin-tarjetas a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    background: #f9fbfb;
+    color: var(--color-texto);
+    text-decoration: none;
+}
+
+.admin-tarjetas a:hover {
+    border-color: var(--color-primario);
+}
+
+.admin-tarjetas span {
+    color: #5b6b73;
+    font-size: 0.9rem;
+}
+
+.admin-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.admin-encabezado h1 {
+    margin: 0 0 0.25rem;
+}
+
+.admin-encabezado p {
+    margin: 0;
+    color: #5b6b73;
+}
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filtros input {
+    min-width: min(100%, 280px);
+}
+
+.tabla-contenedor {
+    overflow-x: auto;
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+}
+
+.tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.tabla-admin th,
+.tabla-admin td {
+    padding: 0.85rem;
+    border-bottom: 1px solid var(--color-borde);
+    text-align: left;
+    vertical-align: top;
+}
+
+.tabla-admin th {
+    background: #f1f6f6;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.tabla-admin tr:last-child td {
+    border-bottom: none;
+}
+
+.tabla-admin small {
+    color: #5b6b73;
+}
+
+.acciones {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.acciones a,
+.acciones button {
+    color: var(--color-primario);
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.formulario-admin {
+    background: #fff;
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.grid-formulario {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.campo--ancho {
+    grid-column: 1 / -1;
+}
+
+.estado {
+    display: inline-block;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.estado--activo,
+.estado--confirmada,
+.estado--completada {
+    background: var(--color-exito-fondo);
+    color: var(--color-exito);
+}
+
+.estado--inactivo,
+.estado--bloqueado,
+.estado--cancelada {
+    background: var(--color-error-fondo);
+    color: var(--color-error);
+}
+
+.estado--pendiente {
+    background: #fff7d6;
+    color: #775600;
+}
+
+.checkbox-lista {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--color-borde);
+    border-radius: 6px;
+    background: #f9fbfb;
+}
+
+.checkbox-lista label {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    font-weight: 400;
+}
+
 .pie {
     text-align: center;
     padding: 1.5rem;
@@ -194,5 +384,14 @@ body {
 @media (max-width: 480px) {
     .formulario-contenedor {
         padding: 1.25rem;
+    }
+
+    .admin-encabezado {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .grid-formulario {
+        grid-template-columns: 1fr;
     }
 }

@@ -22,8 +22,17 @@ require_once BASE_PATH . '/config/Database.php';
 require_once BASE_PATH . '/config/funciones.php';
 require_once BASE_PATH . '/modelos/Usuario.php';
 require_once BASE_PATH . '/modelos/PasswordReset.php';
+require_once BASE_PATH . '/modelos/Destino.php';
+require_once BASE_PATH . '/modelos/Hotel.php';
+require_once BASE_PATH . '/modelos/Actividad.php';
+require_once BASE_PATH . '/modelos/Reservacion.php';
 require_once BASE_PATH . '/servicios/AuthService.php';
 require_once BASE_PATH . '/controladores/AuthController.php';
+require_once BASE_PATH . '/controladores/AdminDestinoController.php';
+require_once BASE_PATH . '/controladores/AdminHotelController.php';
+require_once BASE_PATH . '/controladores/AdminActividadController.php';
+require_once BASE_PATH . '/controladores/AdminUsuarioController.php';
+require_once BASE_PATH . '/controladores/AdminReservacionController.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
