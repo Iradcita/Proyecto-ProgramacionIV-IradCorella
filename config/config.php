@@ -33,6 +33,7 @@ require_once BASE_PATH . '/controladores/AdminHotelController.php';
 require_once BASE_PATH . '/controladores/AdminActividadController.php';
 require_once BASE_PATH . '/controladores/AdminUsuarioController.php';
 require_once BASE_PATH . '/controladores/AdminReservacionController.php';
+require_once BASE_PATH . '/controladores/ClienteController.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

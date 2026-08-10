@@ -1,6 +1,6 @@
 <?php
 
-// Controlador de autenticacion: login, logout, registro y recuperacion de contraseña.
+// Controlador de autenticacion: login, logout, registro y recuperacion de contrasena.
 class AuthController
 {
     private $authService;

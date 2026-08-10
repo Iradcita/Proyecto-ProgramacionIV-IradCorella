@@ -36,6 +36,48 @@ class Destino
         return $stmt->fetchAll();
     }
 
+    // Lista destinos visibles para clientes con busqueda por nombre o provincia.
+    public static function listarPublicos($busqueda = '', $idProvincia = 0)
+    {
+        $conexion = Database::obtenerConexion();
+        $busquedaLike = '%' . $busqueda . '%';
+
+        $sql = "SELECT d.*, p.nombre AS provincia_nombre
+                FROM destinos d
+                INNER JOIN provincias p ON p.id_provincia = d.id_provincia
+                WHERE d.estado = 1
+                  AND (:busqueda = '' OR CONCAT(d.nombre, ' ', p.nombre, ' ', d.descripcion) LIKE :busqueda_like)
+                  AND (:id_provincia = 0 OR d.id_provincia = :id_provincia)
+                ORDER BY d.nombre ASC";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':busqueda', $busqueda);
+        $stmt->bindParam(':busqueda_like', $busquedaLike);
+        $stmt->bindParam(':id_provincia', $idProvincia);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Busca un destino activo con provincia para mostrar detalle al cliente.
+    public static function obtenerPublicoPorId($idDestino)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "SELECT d.*, p.nombre AS provincia_nombre
+                FROM destinos d
+                INNER JOIN provincias p ON p.id_provincia = d.id_provincia
+                WHERE d.id_destino = :id_destino AND d.estado = 1";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_destino', $idDestino);
+        $stmt->execute();
+
+        $fila = $stmt->fetch();
+
+        return $fila ? $fila : null;
+    }
+
     // Lista provincias para llenar el selector del formulario.
     public static function listarProvincias()
     {

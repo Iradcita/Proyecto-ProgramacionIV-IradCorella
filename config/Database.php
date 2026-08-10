@@ -8,7 +8,7 @@ class Database
     public static function obtenerConexion()
     {
         //si no hay conexion con la base de datos, se crea una nueva conexion PDO
-        //se usa el user y la contraseña definidos en el archivo config.php
+        //se usa el user y la contrasena definidos en el archivo config.php
         if (self::$conexion === null) {
             try {
                 $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';

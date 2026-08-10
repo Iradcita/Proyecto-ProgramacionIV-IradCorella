@@ -42,7 +42,29 @@ require BASE_PATH . '/vistas/layouts/header.php';
             </a>
         </div>
     <?php else: ?>
-        <p>Próximamente: destinos, hoteles, actividades y tus reservaciones.</p>
+        <!-- Accesos principales del cliente para consultar y reservar. -->
+        <div class="admin-tarjetas">
+            <a href="<?php echo BASE_URL; ?>/destinos.php">
+                <strong>Destinos</strong>
+                <span>Consulta lugares turisticos activos de Costa Rica.</span>
+            </a>
+            <a href="<?php echo BASE_URL; ?>/hoteles.php">
+                <strong>Hoteles</strong>
+                <span>Busca hospedajes por destino, categoria o precio.</span>
+            </a>
+            <a href="<?php echo BASE_URL; ?>/actividades.php">
+                <strong>Actividades</strong>
+                <span>Encuentra tours y experiencias disponibles.</span>
+            </a>
+            <a href="<?php echo BASE_URL; ?>/reservar.php">
+                <strong>Reservar</strong>
+                <span>Crea una solicitud con hotel, fechas y actividades.</span>
+            </a>
+            <a href="<?php echo BASE_URL; ?>/mis_reservaciones.php">
+                <strong>Mis reservas</strong>
+                <span>Revisa el estado y total de tus reservaciones.</span>
+            </a>
+        </div>
     <?php endif; ?>
 </section>
 

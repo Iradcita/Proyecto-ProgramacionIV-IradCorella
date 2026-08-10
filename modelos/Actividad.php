@@ -40,6 +40,49 @@ class Actividad
         return $stmt->fetchAll();
     }
 
+    // Busca actividades activas para clientes por texto y destino.
+    public static function buscarPublicas($busqueda = '', $idDestino = 0)
+    {
+        $conexion = Database::obtenerConexion();
+        $busquedaLike = '%' . $busqueda . '%';
+
+        $sql = "SELECT a.*, d.nombre AS destino_nombre
+                FROM actividades a
+                INNER JOIN destinos d ON d.id_destino = a.id_destino
+                WHERE a.estado = 1
+                  AND d.estado = 1
+                  AND (:busqueda = '' OR CONCAT(a.nombre, ' ', d.nombre, ' ', a.descripcion) LIKE :busqueda_like)
+                  AND (:id_destino = 0 OR a.id_destino = :id_destino)
+                ORDER BY a.precio ASC, a.nombre ASC";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':busqueda', $busqueda);
+        $stmt->bindParam(':busqueda_like', $busquedaLike);
+        $stmt->bindParam(':id_destino', $idDestino);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Obtiene una actividad activa para validar selecciones del cliente.
+    public static function obtenerActivaPorId($idActividad)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "SELECT a.*
+                FROM actividades a
+                INNER JOIN destinos d ON d.id_destino = a.id_destino
+                WHERE a.id_actividad = :id_actividad AND a.estado = 1 AND d.estado = 1";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_actividad', $idActividad);
+        $stmt->execute();
+
+        $fila = $stmt->fetch();
+
+        return $fila ? $fila : null;
+    }
+
     // Obtiene una actividad por id.
     public static function obtenerPorId($idActividad)
     {

@@ -33,6 +33,31 @@ class Reservacion
         return $stmt->fetchAll();
     }
 
+    // Lista reservaciones del cliente conectado con resumen de hotel y actividades.
+    public static function listarPorUsuario($idUsuario)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "SELECT r.*,
+                       h.nombre AS hotel_nombre,
+                       d.nombre AS destino_nombre,
+                       COUNT(ra.id_reservacion_actividad) AS total_actividades
+                FROM reservaciones r
+                LEFT JOIN reservacion_hotel rh ON rh.id_reservacion = r.id_reservacion
+                LEFT JOIN hoteles h ON h.id_hotel = rh.id_hotel
+                LEFT JOIN destinos d ON d.id_destino = h.id_destino
+                LEFT JOIN reservacion_actividad ra ON ra.id_reservacion = r.id_reservacion
+                WHERE r.id_usuario = :id_usuario
+                GROUP BY r.id_reservacion, h.nombre, d.nombre
+                ORDER BY r.fecha_reserva DESC";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_usuario', $idUsuario);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
     // Obtiene los datos principales de una reservacion.
     public static function obtenerPorId($idReservacion)
     {

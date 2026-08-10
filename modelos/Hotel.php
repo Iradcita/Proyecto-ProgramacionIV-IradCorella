@@ -40,6 +40,51 @@ class Hotel
         return $stmt->fetchAll();
     }
 
+    // Busca hoteles activos para clientes por texto, destino y categoria.
+    public static function buscarPublicos($busqueda = '', $idDestino = 0, $categoria = 0)
+    {
+        $conexion = Database::obtenerConexion();
+        $busquedaLike = '%' . $busqueda . '%';
+
+        $sql = "SELECT h.*, d.nombre AS destino_nombre
+                FROM hoteles h
+                INNER JOIN destinos d ON d.id_destino = h.id_destino
+                WHERE h.estado = 1
+                  AND d.estado = 1
+                  AND (:busqueda = '' OR CONCAT(h.nombre, ' ', d.nombre, ' ', h.descripcion, ' ', h.direccion) LIKE :busqueda_like)
+                  AND (:id_destino = 0 OR h.id_destino = :id_destino)
+                  AND (:categoria = 0 OR h.categoria = :categoria)
+                ORDER BY h.precio_noche ASC, h.nombre ASC";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':busqueda', $busqueda);
+        $stmt->bindParam(':busqueda_like', $busquedaLike);
+        $stmt->bindParam(':id_destino', $idDestino);
+        $stmt->bindParam(':categoria', $categoria);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // Obtiene un hotel activo para validar formularios de cliente.
+    public static function obtenerActivoPorId($idHotel)
+    {
+        $conexion = Database::obtenerConexion();
+
+        $sql = "SELECT h.*
+                FROM hoteles h
+                INNER JOIN destinos d ON d.id_destino = h.id_destino
+                WHERE h.id_hotel = :id_hotel AND h.estado = 1 AND d.estado = 1";
+
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_hotel', $idHotel);
+        $stmt->execute();
+
+        $fila = $stmt->fetch();
+
+        return $fila ? $fila : null;
+    }
+
     // Busca un hotel por id.
     public static function obtenerPorId($idHotel)
     {

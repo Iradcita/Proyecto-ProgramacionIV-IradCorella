@@ -1,6 +1,6 @@
 <?php
 
-// Modelo para los tokens de restablecimiento de contraseña (tabla password_resets)
+// Modelo para los tokens de restablecimiento de contrasena (tabla password_resets)
 class PasswordReset
 {
     public static function crear($idUsuario, $tokenHash, $expiraEn)

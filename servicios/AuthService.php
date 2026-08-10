@@ -1,12 +1,12 @@
 <?php
 
-// Aqui va la logica de negocio del login, registro y recuperacion de contraseña.
+// Aqui va la logica de negocio del login, registro y recuperacion de contrasena.
 class AuthService
 {
     public function login($correo, $password)
     {
         $usuario = Usuario::buscarPorCorreo($correo);
-    //password_verify compara la contraseña ingresada con el hash almacenado en la base de datos
+    //password_verify compara la contrasena ingresada con el hash almacenado en la base de datos
     //esta funcion la trae php
         if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
             throw new Exception('Correo o contraseña incorrectos.');
@@ -49,7 +49,7 @@ class AuthService
         if (Usuario::existeCorreo($correo)) {
             throw new Exception('Ese correo ya está registrado.');
         }
-//aqui es donde se hace el hash de la contraseña antes de guardarla en la base de datos
+//aqui es donde se hace el hash de la contrasena antes de guardarla en la base de datos
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
         return Usuario::crear($nombre, $apellidos, $correo, $telefono, $passwordHash);
