@@ -24,6 +24,8 @@ $usuarioSesion = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
                     <a href="<?php echo BASE_URL; ?>/admin_usuarios.php">Usuarios</a>
                     <a href="<?php echo BASE_URL; ?>/admin_reservaciones.php">Reservaciones</a>
                     <a href="<?php echo BASE_URL; ?>/admin_reportes.php">Reportes</a>
+                    <a href="<?php echo BASE_URL; ?>/admin_resenas.php">Resenas</a>
+                    <a href="<?php echo BASE_URL; ?>/admin_bitacora.php">Bitacora</a>
                 <?php else: ?>
                     <a href="<?php echo BASE_URL; ?>/destinos.php">Destinos</a>
                     <a href="<?php echo BASE_URL; ?>/hoteles.php">Hoteles</a>

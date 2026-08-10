@@ -110,14 +110,17 @@ class AdminReservacionController
 
             if ($idReservacion > 0) {
                 Reservacion::actualizarCompleta($idReservacion, $idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, $estado, $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds);
+                registrarBitacora('ACTUALIZAR_RESERVACION', 'reservaciones', $idReservacion);
                 guardarMensaje('exito', 'Reservacion actualizada correctamente.');
             } else {
-                Reservacion::crearCompleta($idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, $estado, $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds);
+                $idReservacion = Reservacion::crearCompleta($idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, $estado, $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds);
+                registrarBitacora('CREAR_RESERVACION_ADMIN', 'reservaciones', $idReservacion);
                 guardarMensaje('exito', 'Reservacion creada correctamente.');
             }
 
             $this->redirigir('/admin_reservaciones.php');
         } catch (Exception $e) {
+            registrarExcepcion('admin_reservaciones', $e);
             guardarMensaje('error', $e->getMessage());
             $ruta = $idReservacion > 0 ? '/admin_reservaciones.php?accion=editar&id=' . $idReservacion : '/admin_reservaciones.php?accion=nuevo';
             $this->redirigir($ruta);
@@ -137,6 +140,7 @@ class AdminReservacionController
         }
 
         Reservacion::cancelar(obtenerEntero($_POST['id_reservacion'] ?? 0));
+        registrarBitacora('CANCELAR_RESERVACION', 'reservaciones', obtenerEntero($_POST['id_reservacion'] ?? 0));
         guardarMensaje('exito', 'Reservacion cancelada correctamente.');
         $this->redirigir('/admin_reservaciones.php');
     }

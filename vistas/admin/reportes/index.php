@@ -24,6 +24,13 @@ $datosGraficos = array(
         <h1>Reportes</h1>
         <p>Indicadores de reservaciones, usuarios, ingresos y datos externos.</p>
     </div>
+    <div class="acciones-reportes">
+        <a class="boton boton--compacto" href="<?php echo BASE_URL; ?>/admin_reportes.php?exportar=destinos">CSV destinos</a>
+        <a class="boton boton--compacto" href="<?php echo BASE_URL; ?>/admin_reportes.php?exportar=hoteles">CSV hoteles</a>
+        <a class="boton boton--compacto" href="<?php echo BASE_URL; ?>/admin_reportes.php?exportar=actividades">CSV actividades</a>
+        <a class="boton boton--compacto" href="<?php echo BASE_URL; ?>/admin_reportes.php?exportar=fechas">CSV fechas</a>
+        <a class="boton boton--compacto" href="<?php echo BASE_URL; ?>/admin_reportes.php?exportar=ingresos">CSV ingresos</a>
+    </div>
 </section>
 
 <?php require BASE_PATH . '/vistas/layouts/mensajes.php'; ?>

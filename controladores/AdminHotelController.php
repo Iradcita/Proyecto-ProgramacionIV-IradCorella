@@ -103,14 +103,17 @@ class AdminHotelController
 
             if ($idHotel > 0) {
                 Hotel::actualizar($idHotel, $idDestino, $nombre, $categoria, $direccion, $telefono, $correo, $precioNoche, $cantidadHabitaciones, $descripcion, $imagen, $estado);
+                registrarBitacora('ACTUALIZAR_HOTEL', 'hoteles', $idHotel);
                 guardarMensaje('exito', 'Hotel actualizado correctamente.');
             } else {
-                Hotel::crear($idDestino, $nombre, $categoria, $direccion, $telefono, $correo, $precioNoche, $cantidadHabitaciones, $descripcion, $imagen, $estado);
+                $idHotel = Hotel::crear($idDestino, $nombre, $categoria, $direccion, $telefono, $correo, $precioNoche, $cantidadHabitaciones, $descripcion, $imagen, $estado);
+                registrarBitacora('CREAR_HOTEL', 'hoteles', $idHotel);
                 guardarMensaje('exito', 'Hotel creado correctamente.');
             }
 
             $this->redirigir('/admin_hoteles.php');
         } catch (Exception $e) {
+            registrarExcepcion('admin_hoteles', $e);
             guardarMensaje('error', $e->getMessage());
             $ruta = $idHotel > 0 ? '/admin_hoteles.php?accion=editar&id=' . $idHotel : '/admin_hoteles.php?accion=nuevo';
             $this->redirigir($ruta);
@@ -130,6 +133,7 @@ class AdminHotelController
         }
 
         Hotel::desactivar(obtenerEntero($_POST['id_hotel'] ?? 0));
+        registrarBitacora('DESACTIVAR_HOTEL', 'hoteles', obtenerEntero($_POST['id_hotel'] ?? 0));
         guardarMensaje('exito', 'Hotel desactivado correctamente.');
         $this->redirigir('/admin_hoteles.php');
     }

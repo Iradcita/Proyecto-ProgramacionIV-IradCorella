@@ -106,15 +106,18 @@ class AdminUsuarioController
                 }
 
                 $this->actualizarSesionSiCorresponde($idUsuario, $idRol, $nombre, $apellidos, $correo);
+                registrarBitacora('ACTUALIZAR_USUARIO', 'usuarios', $idUsuario);
                 guardarMensaje('exito', 'Usuario actualizado correctamente.');
             } else {
                 $this->validarPassword($password);
-                Usuario::crearAdmin($idRol, $nombre, $apellidos, $correo, $telefono, $fotoUrl, password_hash($password, PASSWORD_BCRYPT), $estado);
+                $idUsuario = Usuario::crearAdmin($idRol, $nombre, $apellidos, $correo, $telefono, $fotoUrl, password_hash($password, PASSWORD_BCRYPT), $estado);
+                registrarBitacora('CREAR_USUARIO', 'usuarios', $idUsuario);
                 guardarMensaje('exito', 'Usuario creado correctamente.');
             }
 
             $this->redirigir('/admin_usuarios.php');
         } catch (Exception $e) {
+            registrarExcepcion('admin_usuarios', $e);
             guardarMensaje('error', $e->getMessage());
             $ruta = $idUsuario > 0 ? '/admin_usuarios.php?accion=editar&id=' . $idUsuario : '/admin_usuarios.php?accion=nuevo';
             $this->redirigir($ruta);
@@ -141,6 +144,7 @@ class AdminUsuarioController
         }
 
         Usuario::actualizarEstado($idUsuario, 'inactivo');
+        registrarBitacora('DESACTIVAR_USUARIO', 'usuarios', $idUsuario);
         guardarMensaje('exito', 'Usuario desactivado correctamente.');
         $this->redirigir('/admin_usuarios.php');
     }

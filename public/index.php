@@ -44,6 +44,14 @@ require BASE_PATH . '/vistas/layouts/header.php';
                 <strong>Reportes</strong>
                 <span>Revisar indicadores, ingresos y datos externos.</span>
             </a>
+            <a href="<?php echo BASE_URL; ?>/admin_resenas.php">
+                <strong>Resenas</strong>
+                <span>Moderar comentarios y calificaciones de destinos.</span>
+            </a>
+            <a href="<?php echo BASE_URL; ?>/admin_bitacora.php">
+                <strong>Bitacora</strong>
+                <span>Consultar acciones internas del sistema.</span>
+            </a>
         </div>
     <?php else: ?>
         <!-- Accesos principales del cliente para consultar y reservar. -->

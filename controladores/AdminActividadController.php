@@ -92,14 +92,17 @@ class AdminActividadController
 
             if ($idActividad > 0) {
                 Actividad::actualizar($idActividad, $idDestino, $nombre, $descripcion, $precio, $duracionMinutos, $cupoMaximo, $imagen, $estado);
+                registrarBitacora('ACTUALIZAR_ACTIVIDAD', 'actividades', $idActividad);
                 guardarMensaje('exito', 'Actividad actualizada correctamente.');
             } else {
-                Actividad::crear($idDestino, $nombre, $descripcion, $precio, $duracionMinutos, $cupoMaximo, $imagen, $estado);
+                $idActividad = Actividad::crear($idDestino, $nombre, $descripcion, $precio, $duracionMinutos, $cupoMaximo, $imagen, $estado);
+                registrarBitacora('CREAR_ACTIVIDAD', 'actividades', $idActividad);
                 guardarMensaje('exito', 'Actividad creada correctamente.');
             }
 
             $this->redirigir('/admin_actividades.php');
         } catch (Exception $e) {
+            registrarExcepcion('admin_actividades', $e);
             guardarMensaje('error', $e->getMessage());
             $ruta = $idActividad > 0 ? '/admin_actividades.php?accion=editar&id=' . $idActividad : '/admin_actividades.php?accion=nuevo';
             $this->redirigir($ruta);
@@ -119,6 +122,7 @@ class AdminActividadController
         }
 
         Actividad::desactivar(obtenerEntero($_POST['id_actividad'] ?? 0));
+        registrarBitacora('DESACTIVAR_ACTIVIDAD', 'actividades', obtenerEntero($_POST['id_actividad'] ?? 0));
         guardarMensaje('exito', 'Actividad desactivada correctamente.');
         $this->redirigir('/admin_actividades.php');
     }

@@ -51,11 +51,17 @@ class ApiService
         $respuesta = @file_get_contents($url, false, $contexto);
 
         if ($respuesta === false) {
+            LoggerService::registrar('error', 'api_rest', 'No se pudo consultar: ' . $url);
             return null;
         }
 
         $datos = json_decode($respuesta, true);
 
-        return is_array($datos) ? $datos : null;
+        if (!is_array($datos)) {
+            LoggerService::registrar('error', 'api_rest', 'Respuesta JSON invalida: ' . $url);
+            return null;
+        }
+
+        return $datos;
     }
 }

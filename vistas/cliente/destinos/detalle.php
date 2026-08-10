@@ -72,4 +72,50 @@
     </div>
 </section>
 
+<!-- Resenas aprobadas y formulario del cliente. -->
+<section class="seccion-cliente">
+    <div class="admin-encabezado">
+        <div>
+            <h2>Resenas del destino</h2>
+            <p>Comentarios aprobados por administracion.</p>
+        </div>
+    </div>
+
+    <div class="catalogo-grid catalogo-grid--compacto">
+        <?php foreach ($resenas as $resena): ?>
+            <article class="detalle-bloque">
+                <h3><?php echo (int) $resena['calificacion']; ?>/5</h3>
+                <p><?php echo htmlspecialchars($resena['comentario'] ?? '', ENT_QUOTES); ?></p>
+                <p class="texto-muted"><?php echo htmlspecialchars($resena['usuario_nombre'], ENT_QUOTES); ?></p>
+            </article>
+        <?php endforeach; ?>
+        <?php if (empty($resenas)): ?>
+            <p>No hay resenas aprobadas para este destino.</p>
+        <?php endif; ?>
+    </div>
+
+    <form class="formulario-admin seccion-cliente" method="post" action="<?php echo BASE_URL; ?>/resenas.php">
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES); ?>">
+        <input type="hidden" name="id_destino" value="<?php echo (int) $destino['id_destino']; ?>">
+
+        <h2><?php echo $resenaUsuario ? 'Actualizar mi resena' : 'Agregar mi resena'; ?></h2>
+        <div class="grid-formulario">
+            <div class="campo">
+                <label for="calificacion">Calificacion</label>
+                <select id="calificacion" name="calificacion" required>
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                        <option value="<?php echo $i; ?>" <?php echo $resenaUsuario && (int) $resenaUsuario['calificacion'] === $i ? 'selected' : ''; ?>><?php echo $i; ?>/5</option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="campo campo--ancho">
+                <label for="comentario">Comentario</label>
+                <textarea id="comentario" name="comentario" maxlength="1000"><?php echo htmlspecialchars($resenaUsuario['comentario'] ?? '', ENT_QUOTES); ?></textarea>
+                <small>La resena queda pendiente de revision antes de mostrarse.</small>
+            </div>
+        </div>
+        <button class="boton boton--primario" type="submit">Enviar resena</button>
+    </form>
+</section>
+
 <?php require BASE_PATH . '/vistas/layouts/footer.php'; ?>

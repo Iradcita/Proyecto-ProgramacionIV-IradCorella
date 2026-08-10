@@ -6,7 +6,7 @@ class ClienteController
     // Muestra destinos activos con filtros por texto y provincia.
     public function destinos()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $busqueda = trim($_GET['busqueda'] ?? '');
         $idProvincia = obtenerEntero($_GET['provincia'] ?? 0);
@@ -21,7 +21,7 @@ class ClienteController
     // Presenta el detalle de un destino con hoteles y actividades relacionadas.
     public function detalleDestino()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $idDestino = obtenerEntero($_GET['id'] ?? 0);
         $destino = Destino::obtenerPublicoPorId($idDestino);
@@ -33,7 +33,10 @@ class ClienteController
 
         $hoteles = Hotel::buscarPublicos('', $idDestino, 0);
         $actividades = Actividad::buscarPublicas('', $idDestino);
+        $resenas = Resena::listarAprobadasPorDestino($idDestino);
+        $resenaUsuario = Resena::obtenerDeUsuarioDestino(obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0), $idDestino);
         $mensajes = obtenerMensajes();
+        $csrfToken = generarTokenCsrf();
         $tituloPagina = 'Detalle de destino - NubeTurismo';
 
         require BASE_PATH . '/vistas/cliente/destinos/detalle.php';
@@ -42,7 +45,7 @@ class ClienteController
     // Busca hoteles activos por texto, destino y categoria.
     public function hoteles()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $busqueda = trim($_GET['busqueda'] ?? '');
         $idDestino = obtenerEntero($_GET['destino'] ?? 0);
@@ -58,7 +61,7 @@ class ClienteController
     // Busca actividades activas por texto y destino.
     public function actividades()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $busqueda = trim($_GET['busqueda'] ?? '');
         $idDestino = obtenerEntero($_GET['destino'] ?? 0);
@@ -73,7 +76,7 @@ class ClienteController
     // Abre el formulario de reserva para el cliente conectado.
     public function mostrarReservar()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $idDestino = obtenerEntero($_GET['destino'] ?? 0);
         $hotelPreseleccionado = obtenerEntero($_GET['hotel'] ?? 0);
@@ -90,7 +93,7 @@ class ClienteController
     // Guarda la reserva nueva del cliente autenticado.
     public function guardarReservacion()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirigir('/reservar.php');
@@ -139,10 +142,13 @@ class ClienteController
                 throw new Exception('Personas y habitaciones deben ser valores positivos.');
             }
 
-            Reservacion::crearCompleta($idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, 'pendiente', $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds);
+            $actividadesIds = array_values(array_unique($actividadesIds));
+            $idReservacion = Reservacion::crearCompleta($idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, 'pendiente', $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds);
+            registrarBitacora('CREAR_RESERVACION_CLIENTE', 'reservaciones', $idReservacion);
             guardarMensaje('exito', 'Tu reservacion fue creada y queda pendiente de confirmacion.');
             $this->redirigir('/mis_reservaciones.php');
         } catch (Exception $e) {
+            registrarExcepcion('cliente_reservacion', $e);
             guardarMensaje('error', $e->getMessage());
             $this->redirigir('/reservar.php');
         }
@@ -151,7 +157,7 @@ class ClienteController
     // Muestra el historial de reservas del cliente conectado.
     public function misReservaciones()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
         $reservaciones = Reservacion::listarPorUsuario($idUsuario);
@@ -164,7 +170,7 @@ class ClienteController
     // Muestra el detalle de una reservacion propia del cliente.
     public function detalleReservacion()
     {
-        exigirAutenticacion();
+        exigirCliente();
 
         $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
         $idReservacion = obtenerEntero($_GET['id'] ?? 0);
@@ -180,6 +186,49 @@ class ClienteController
         $tituloPagina = 'Detalle de reservacion - NubeTurismo';
 
         require BASE_PATH . '/vistas/cliente/reservacion_detalle.php';
+    }
+
+    // Guarda una resena de destino enviada por el cliente.
+    public function guardarResena()
+    {
+        exigirCliente();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirigir('/destinos.php');
+        }
+
+        if (!validarTokenCsrf($_POST['csrf_token'] ?? '')) {
+            guardarMensaje('error', 'El formulario expiro. Intenta nuevamente.');
+            $this->redirigir('/destinos.php');
+        }
+
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+        $idDestino = obtenerEntero($_POST['id_destino'] ?? 0);
+        $calificacion = obtenerEntero($_POST['calificacion'] ?? 0);
+        $comentario = trim($_POST['comentario'] ?? '');
+
+        try {
+            if (!Destino::obtenerPublicoPorId($idDestino)) {
+                throw new Exception('El destino no esta disponible.');
+            }
+
+            if ($calificacion < 1 || $calificacion > 5) {
+                throw new Exception('La calificacion debe estar entre 1 y 5.');
+            }
+
+            if (strlen($comentario) > 1000) {
+                throw new Exception('El comentario supera el largo permitido.');
+            }
+
+            $idResena = Resena::guardar($idUsuario, $idDestino, $calificacion, $comentario);
+            registrarBitacora('GUARDAR_RESENA', 'resenas_destinos', $idResena);
+            guardarMensaje('exito', 'Tu resena fue enviada y queda pendiente de revision.');
+        } catch (Exception $e) {
+            registrarExcepcion('cliente_resena', $e);
+            guardarMensaje('error', $e->getMessage());
+        }
+
+        $this->redirigir('/destinos.php?accion=detalle&id=' . $idDestino);
     }
 
     // Muestra el perfil editable del usuario conectado.
@@ -224,8 +273,10 @@ class ClienteController
 
             Usuario::actualizarPerfil($idUsuario, $nombre, $apellidos, $correo, $telefono);
             $this->actualizarSesionPerfil($idUsuario);
+            registrarBitacora('ACTUALIZAR_PERFIL', 'usuarios', $idUsuario);
             guardarMensaje('exito', 'Perfil actualizado correctamente.');
         } catch (Exception $e) {
+            registrarExcepcion('cliente_perfil', $e);
             guardarMensaje('error', $e->getMessage());
         }
 
@@ -256,8 +307,10 @@ class ClienteController
 
             $this->validarPassword($passwordNueva);
             Usuario::actualizarPassword($idUsuario, password_hash($passwordNueva, PASSWORD_BCRYPT));
+            registrarBitacora('CAMBIAR_PASSWORD', 'usuarios', $idUsuario);
             guardarMensaje('exito', 'Contrasena actualizada correctamente.');
         } catch (Exception $e) {
+            registrarExcepcion('cliente_password', $e);
             guardarMensaje('error', $e->getMessage());
         }
 
@@ -277,6 +330,7 @@ class ClienteController
                 $this->eliminarArchivoFotoActual($idUsuario);
                 Usuario::actualizarFoto($idUsuario, null);
                 $this->actualizarSesionPerfil($idUsuario);
+                registrarBitacora('ELIMINAR_FOTO_PERFIL', 'usuarios', $idUsuario);
                 guardarMensaje('exito', 'Fotografia eliminada correctamente.');
                 $this->redirigir('/perfil.php');
             }
@@ -315,8 +369,10 @@ class ClienteController
             $this->eliminarArchivoFotoActual($idUsuario);
             Usuario::actualizarFoto($idUsuario, 'uploads/perfiles/' . $nombreArchivo);
             $this->actualizarSesionPerfil($idUsuario);
+            registrarBitacora('ACTUALIZAR_FOTO_PERFIL', 'usuarios', $idUsuario);
             guardarMensaje('exito', 'Fotografia actualizada correctamente.');
         } catch (Exception $e) {
+            registrarExcepcion('cliente_foto', $e);
             guardarMensaje('error', $e->getMessage());
         }
 

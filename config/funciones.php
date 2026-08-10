@@ -45,6 +45,12 @@ function esAdministrador()
     return usuarioAutenticado() && isset($_SESSION['usuario']['id_rol']) && (int) $_SESSION['usuario']['id_rol'] === 1;
 }
 
+// Indica si el usuario conectado tiene el rol de Cliente.
+function esCliente()
+{
+    return usuarioAutenticado() && isset($_SESSION['usuario']['id_rol']) && (int) $_SESSION['usuario']['id_rol'] === 2;
+}
+
 // Obliga a que exista una sesion iniciada antes de entrar a una pagina privada.
 function exigirAutenticacion()
 {
@@ -64,6 +70,35 @@ function exigirAdministrador()
         header('Location: ' . BASE_URL . '/index.php');
         exit;
     }
+}
+
+// Protege modulos de cliente para evitar acceso cruzado desde administracion.
+function exigirCliente()
+{
+    exigirAutenticacion();
+
+    if (!esCliente()) {
+        guardarMensaje('error', 'No tienes permisos para ingresar a este modulo.');
+        header('Location: ' . BASE_URL . '/index.php');
+        exit;
+    }
+}
+
+// Registra una accion en bitacora sin romper el flujo si falla el log.
+function registrarBitacora($accion, $tablaAfectada = null, $idRegistroAfectado = null)
+{
+    try {
+        $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
+        Bitacora::registrar($idUsuario, $accion, $tablaAfectada, $idRegistroAfectado);
+    } catch (Exception $e) {
+        LoggerService::registrar('error', 'bitacora', $e->getMessage());
+    }
+}
+
+// Registra excepciones internas con contexto del modulo.
+function registrarExcepcion($contexto, $excepcion)
+{
+    LoggerService::registrar('error', $contexto, $excepcion->getMessage());
 }
 
 // Convierte valores recibidos del formulario o URL a enteros seguros.

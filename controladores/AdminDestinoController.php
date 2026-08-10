@@ -86,14 +86,17 @@ class AdminDestinoController
 
             if ($idDestino > 0) {
                 Destino::actualizar($idDestino, $idProvincia, $nombre, $descripcion, $imagen, $latitud, $longitud, $estado);
+                registrarBitacora('ACTUALIZAR_DESTINO', 'destinos', $idDestino);
                 guardarMensaje('exito', 'Destino actualizado correctamente.');
             } else {
-                Destino::crear($idProvincia, $nombre, $descripcion, $imagen, $latitud, $longitud, $estado);
+                $idDestino = Destino::crear($idProvincia, $nombre, $descripcion, $imagen, $latitud, $longitud, $estado);
+                registrarBitacora('CREAR_DESTINO', 'destinos', $idDestino);
                 guardarMensaje('exito', 'Destino creado correctamente.');
             }
 
             $this->redirigir('/admin_destinos.php');
         } catch (Exception $e) {
+            registrarExcepcion('admin_destinos', $e);
             guardarMensaje('error', $e->getMessage());
             $ruta = $idDestino > 0 ? '/admin_destinos.php?accion=editar&id=' . $idDestino : '/admin_destinos.php?accion=nuevo';
             $this->redirigir($ruta);
@@ -113,6 +116,7 @@ class AdminDestinoController
         }
 
         Destino::desactivar(obtenerEntero($_POST['id_destino'] ?? 0));
+        registrarBitacora('DESACTIVAR_DESTINO', 'destinos', obtenerEntero($_POST['id_destino'] ?? 0));
         guardarMensaje('exito', 'Destino desactivado correctamente.');
         $this->redirigir('/admin_destinos.php');
     }
