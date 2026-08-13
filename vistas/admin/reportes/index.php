@@ -1,20 +1,65 @@
 <?php require BASE_PATH . '/vistas/layouts/header.php'; ?>
 
 <?php
-// Datos compactos para que JavaScript pinte graficos sin librerias externas.
+/*
+   Aqui se preparan los datos para los graficos.
+
+   El JavaScript (recursos/js/reportes.js) necesita recibir la informacion
+   siempre con el mismo formato: una "etiqueta" y un "valor" numerico.
+
+       label = el texto que se muestra al lado de la barra
+       value = el numero que define que tan larga va la barra
+
+   Por eso se recorre cada reporte con un foreach y se va armando una lista
+   nueva y sencilla. Luego, mas abajo, esta lista se convierte a JSON para
+   que el JavaScript la pueda leer.
+*/
+
+// 1. Reservaciones por destino
+$graficoDestinos = array();
+foreach ($reservacionesPorDestino as $fila) {
+    $graficoDestinos[] = array(
+        'label' => $fila['destino'],
+        'value' => (int) $fila['total_reservaciones'],
+    );
+}
+
+// 2. Hoteles mas reservados
+$graficoHoteles = array();
+foreach ($hotelesMasReservados as $fila) {
+    $graficoHoteles[] = array(
+        'label' => $fila['hotel'],
+        'value' => (int) $fila['total_reservas'],
+    );
+}
+
+// 3. Actividades mas solicitadas
+$graficoActividades = array();
+foreach ($actividadesMasSolicitadas as $fila) {
+    $graficoActividades[] = array(
+        'label' => $fila['actividad'],
+        'value' => (int) $fila['total_solicitudes'],
+    );
+}
+
+// 4. Reservaciones por fecha.
+//    Se usa array_reverse porque la consulta trae las fechas de la mas
+//    reciente a la mas vieja, y en el grafico se ven mejor al reves.
+$fechasOrdenadas = array_reverse($reservacionesPorFecha);
+$graficoFechas = array();
+foreach ($fechasOrdenadas as $fila) {
+    $graficoFechas[] = array(
+        'label' => $fila['fecha'],
+        'value' => (int) $fila['total_reservaciones'],
+    );
+}
+
+// Se juntan los cuatro graficos en un solo arreglo.
 $datosGraficos = array(
-    'destinos' => array_map(function ($fila) {
-        return array('label' => $fila['destino'], 'value' => (int) $fila['total_reservaciones']);
-    }, $reservacionesPorDestino),
-    'hoteles' => array_map(function ($fila) {
-        return array('label' => $fila['hotel'], 'value' => (int) $fila['total_reservas']);
-    }, $hotelesMasReservados),
-    'actividades' => array_map(function ($fila) {
-        return array('label' => $fila['actividad'], 'value' => (int) $fila['total_solicitudes']);
-    }, $actividadesMasSolicitadas),
-    'fechas' => array_map(function ($fila) {
-        return array('label' => $fila['fecha'], 'value' => (int) $fila['total_reservaciones']);
-    }, array_reverse($reservacionesPorFecha)),
+    'destinos' => $graficoDestinos,
+    'hoteles' => $graficoHoteles,
+    'actividades' => $graficoActividades,
+    'fechas' => $graficoFechas,
 );
 ?>
 

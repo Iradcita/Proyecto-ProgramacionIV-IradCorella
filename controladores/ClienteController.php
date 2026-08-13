@@ -3,6 +3,15 @@
 // Controlador para las pantallas del cliente: catalogo, busquedas y reservas.
 class ClienteController
 {
+    private $apiService;
+
+    // El servicio de APIs se crea una sola vez y queda disponible
+    // para todas las pantallas del cliente que lo necesiten.
+    public function __construct()
+    {
+        $this->apiService = new ApiService();
+    }
+
     // Muestra destinos activos con filtros por texto y provincia.
     public function destinos()
     {
@@ -35,6 +44,17 @@ class ClienteController
         $actividades = Actividad::buscarPublicas('', $idDestino);
         $resenas = Resena::listarAprobadasPorDestino($idDestino);
         $resenaUsuario = Resena::obtenerDeUsuarioDestino(obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0), $idDestino);
+
+        // API REST #1: clima actual del destino usando sus coordenadas.
+        // Si el destino no tiene latitud/longitud simplemente no se consulta.
+        $clima = null;
+        if (!empty($destino['latitud']) && !empty($destino['longitud'])) {
+            $clima = $this->apiService->obtenerClima($destino['latitud'], $destino['longitud']);
+        }
+
+        // API REST #2: tipo de cambio para mostrar los precios tambien en dolares.
+        $tipoCambio = $this->apiService->obtenerTipoCambio();
+
         $mensajes = obtenerMensajes();
         $csrfToken = generarTokenCsrf();
         $tituloPagina = 'Detalle de destino - NubeTurismo';
@@ -111,9 +131,14 @@ class ClienteController
         $cantidadPersonas = obtenerEntero($_POST['cantidad_personas'] ?? 0);
         $cantidadHabitaciones = obtenerEntero($_POST['cantidad_habitaciones'] ?? 0);
         $observaciones = trim($_POST['observaciones'] ?? '');
-        $actividadesIds = isset($_POST['actividades']) && is_array($_POST['actividades'])
-            ? array_map('intval', $_POST['actividades'])
-            : array();
+        // Las actividades llegan como un arreglo de checkbox marcados.
+        // Se recorren una por una y se convierten a numero entero por seguridad.
+        $actividadesIds = array();
+        if (isset($_POST['actividades']) && is_array($_POST['actividades'])) {
+            foreach ($_POST['actividades'] as $idActividad) {
+                $actividadesIds[] = (int) $idActividad;
+            }
+        }
 
         try {
             if (!Hotel::obtenerActivoPorId($idHotel)) {

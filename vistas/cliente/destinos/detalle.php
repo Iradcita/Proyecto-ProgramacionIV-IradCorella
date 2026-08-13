@@ -13,7 +13,7 @@
     </div>
     <div class="detalle-destino__imagen">
         <?php if (!empty($destino['imagen_principal'])): ?>
-            <img src="<?php echo htmlspecialchars($destino['imagen_principal'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($destino['nombre'], ENT_QUOTES); ?>">
+            <img onerror="this.style.display='none';" src="<?php echo htmlspecialchars($destino['imagen_principal'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($destino['nombre'], ENT_QUOTES); ?>">
         <?php else: ?>
             <span><?php echo htmlspecialchars(substr($destino['nombre'], 0, 1), ENT_QUOTES); ?></span>
         <?php endif; ?>
@@ -21,6 +21,47 @@
 </section>
 
 <?php require BASE_PATH . '/vistas/layouts/mensajes.php'; ?>
+
+<?php
+// Se calcula una sola vez el tipo de cambio para reutilizarlo en todos los precios.
+// Si la API no respondio, $tasaDolar queda en 0 y no se muestra la conversion.
+$tasaDolar = (!empty($tipoCambio) && !empty($tipoCambio['rate'])) ? (float) $tipoCambio['rate'] : 0;
+?>
+
+<!-- ==========================================================================
+     Informacion tomada de dos APIs REST publicas:
+     1. Open-Meteo  -> clima actual segun las coordenadas del destino.
+     2. Frankfurter -> tipo de cambio para mostrar los precios en dolares.
+     ========================================================================== -->
+<section class="tarjeta-api">
+    <h2>&#9925; Informacion en vivo del destino</h2>
+
+    <?php if (!empty($clima)): ?>
+        <article>
+            <span>Temperatura actual</span>
+            <strong><?php echo htmlspecialchars((string) $clima['temperature_2m'], ENT_QUOTES); ?> &deg;C</strong>
+        </article>
+        <article>
+            <span>Humedad</span>
+            <strong><?php echo htmlspecialchars((string) $clima['relative_humidity_2m'], ENT_QUOTES); ?> %</strong>
+        </article>
+        <article>
+            <span>Viento</span>
+            <strong><?php echo htmlspecialchars((string) $clima['wind_speed_10m'], ENT_QUOTES); ?> km/h</strong>
+        </article>
+    <?php else: ?>
+        <p class="tarjeta-api__aviso">Por el momento no se pudo consultar el clima de este destino.</p>
+    <?php endif; ?>
+
+    <?php if ($tasaDolar > 0): ?>
+        <article>
+            <span>Tipo de cambio (USD)</span>
+            <strong>CRC <?php echo number_format($tasaDolar, 2); ?></strong>
+        </article>
+    <?php else: ?>
+        <p class="tarjeta-api__aviso">No se pudo consultar el tipo de cambio en este momento.</p>
+    <?php endif; ?>
+</section>
 
 <!-- Hoteles activos relacionados con el destino. -->
 <section class="seccion-cliente">
@@ -36,7 +77,13 @@
                 <div class="catalogo-item__contenido">
                     <h3><?php echo htmlspecialchars($hotel['nombre'], ENT_QUOTES); ?></h3>
                     <p><?php echo htmlspecialchars($hotel['descripcion'], ENT_QUOTES); ?></p>
-                    <p><strong>CRC <?php echo number_format((float) $hotel['precio_noche'], 2); ?></strong> por noche</p>
+                    <p>
+                        <strong>CRC <?php echo number_format((float) $hotel['precio_noche'], 2); ?></strong> por noche
+                        <?php if ($tasaDolar > 0): ?>
+                            <!-- Conversion calculada con la tasa que devolvio la API -->
+                            <span class="precio-dolares">aprox. USD <?php echo number_format((float) $hotel['precio_noche'] / $tasaDolar, 2); ?></span>
+                        <?php endif; ?>
+                    </p>
                     <a href="<?php echo BASE_URL; ?>/reservar.php?destino=<?php echo (int) $destino['id_destino']; ?>&hotel=<?php echo (int) $hotel['id_hotel']; ?>">Reservar hotel</a>
                 </div>
             </article>
@@ -61,7 +108,12 @@
                 <div class="catalogo-item__contenido">
                     <h3><?php echo htmlspecialchars($actividad['nombre'], ENT_QUOTES); ?></h3>
                     <p><?php echo htmlspecialchars($actividad['descripcion'], ENT_QUOTES); ?></p>
-                    <p><strong>CRC <?php echo number_format((float) $actividad['precio'], 2); ?></strong> por persona</p>
+                    <p>
+                        <strong>CRC <?php echo number_format((float) $actividad['precio'], 2); ?></strong> por persona
+                        <?php if ($tasaDolar > 0): ?>
+                            <span class="precio-dolares">aprox. USD <?php echo number_format((float) $actividad['precio'] / $tasaDolar, 2); ?></span>
+                        <?php endif; ?>
+                    </p>
                     <p class="texto-muted"><?php echo (int) $actividad['duracion_minutos']; ?> min, cupo <?php echo (int) $actividad['cupo_maximo']; ?></p>
                 </div>
             </article>

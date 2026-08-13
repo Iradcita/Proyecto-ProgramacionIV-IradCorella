@@ -1,6 +1,16 @@
 <?php
 
-// Servicio para consumir APIs REST publicas usadas por los reportes.
+// Servicio para consumir las dos APIs REST publicas del proyecto.
+//
+// Se usan dos servicios gratuitos que NO piden llave de acceso:
+//   1. Open-Meteo   -> clima actual segun latitud y longitud del destino.
+//   2. Frankfurter  -> tipo de cambio del dolar para mostrar precios en USD.
+//
+// Ambas se consultan desde el detalle del destino (lado del cliente) y
+// tambien desde el panel de reportes del administrador.
+//
+// Importante: si una API no responde el metodo devuelve null y la pagina
+// sigue funcionando normal, solo que sin ese dato extra.
 class ApiService
 {
     // Consulta clima actual con Open-Meteo usando latitud y longitud.
@@ -33,7 +43,9 @@ class ApiService
         return $datos;
     }
 
-    // Ejecuta una peticion GET y decodifica JSON con tiempo limite corto.
+    // Ejecuta una peticion GET y convierte la respuesta JSON en arreglo PHP.
+    // El timeout corto (6 segundos) evita que la pagina se quede pegada
+    // esperando si el servicio externo esta caido o va muy lento.
     private function obtenerJson($url)
     {
         $contexto = stream_context_create(array(

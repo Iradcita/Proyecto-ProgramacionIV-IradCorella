@@ -44,11 +44,11 @@ CREATE TABLE `actividades` (
 --
 
 INSERT INTO `actividades` (`id_actividad`, `id_destino`, `nombre`, `descripcion`, `precio`, `duracion_minutos`, `cupo_maximo`, `imagen`, `estado`) VALUES
-(1, 1, 'Senderismo guiado', 'Senderismo por los senderos del volcán Arenal con guía experto.', 22000.00, 180, 20, 'uploads/actividades/senderismo.jpg', 1),
+(1, 1, 'Senderismo guiado', 'Senderismo por los senderos del volcán Arenal con guía experto.', 22000.00, 180, 20, NULL, 1),
 (2, 1, 'Tour de puentes colgantes', 'Puentes colgantes y vistas panorámicas de la selva tropical.', 28000.00, 150, 18, 'uploads/actividades/puentes.jpg', 1),
-(3, 2, 'Tour de playa y senderos', 'Exploración de las playas y senderos de Manuel Antonio.', 25000.00, 240, 15, 'uploads/actividades/playa-senderos.jpg', 1),
+(3, 2, 'Tour de playa y senderos', 'Exploración de las playas y senderos de Manuel Antonio.', 25000.00, 240, 15, NULL, 1),
 (4, 2, 'Paseo en kayak', 'Riesgoso pero emocionante paseo en kayak por la costa de Manuel Antonio.', 32000.00, 120, 12, 'uploads/actividades/kayak.jpg', 1),
-(5, 3, 'Tour cultural caribeño', 'Tour de todas las islas del caribe, con degustación de comida típica.', 18000.00, 120, 25, 'uploads/actividades/tour-cultural.jpg', 1);
+(5, 3, 'Tour cultural caribeño', 'Tour de todas las islas del caribe, con degustación de comida típica.', 18000.00, 120, 25, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -94,9 +94,9 @@ CREATE TABLE `destinos` (
 --
 
 INSERT INTO `destinos` (`id_destino`, `id_provincia`, `nombre`, `descripcion`, `imagen_principal`, `latitud`, `longitud`, `estado`) VALUES
-(1, 2, 'La Fortuna', 'Destino con opciones de naturaleza, aventura y descanso.', 'uploads/destinos/la-fortuna.jpg', NULL, NULL, 1),
-(2, 6, 'Manuel Antonio', 'Destino con playas, senderos y actividades al aire libre.', 'uploads/destinos/manuel-antonio.jpg', NULL, NULL, 1),
-(3, 7, 'Puerto Viejo', 'Destino de ejemplo de ambiente costero', 'uploads/destinos/puerto-viejo.jpg', NULL, NULL, 1);
+(1, 2, 'La Fortuna', 'Destino con opciones de naturaleza, aventura y descanso.', 'uploads/destinos/la-fortuna.jpg', 10.4678000, -84.6427000, 1),
+(2, 6, 'Manuel Antonio', 'Destino con playas, senderos y actividades al aire libre.', 'uploads/destinos/manuel-antonio.jpg', 9.3920000, -84.1370000, 1),
+(3, 7, 'Puerto Viejo', 'Destino de ejemplo de ambiente costero', 'uploads/destinos/puerto-viejo.jpg', 9.6560000, -82.7548000, 1);
 
 -- --------------------------------------------------------
 

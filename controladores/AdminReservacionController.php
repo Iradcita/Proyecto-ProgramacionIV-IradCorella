@@ -48,9 +48,12 @@ class AdminReservacionController
 
         $reservacionHotel = $idReservacion > 0 ? Reservacion::obtenerHotel($idReservacion) : null;
         $reservacionActividades = $idReservacion > 0 ? Reservacion::obtenerActividades($idReservacion) : array();
-        $actividadesSeleccionadas = array_map(function ($fila) {
-            return (int) $fila['id_actividad'];
-        }, $reservacionActividades);
+        // Se arma una lista simple con los ID de las actividades ya guardadas,
+        // para poder marcar los checkbox correspondientes en el formulario.
+        $actividadesSeleccionadas = array();
+        foreach ($reservacionActividades as $fila) {
+            $actividadesSeleccionadas[] = (int) $fila['id_actividad'];
+        }
 
         $clientes = Usuario::listarClientesActivos();
         $hoteles = Hotel::listarActivos();
@@ -83,9 +86,14 @@ class AdminReservacionController
         $cantidadHabitaciones = obtenerEntero($_POST['cantidad_habitaciones'] ?? 0);
         $estado = trim($_POST['estado'] ?? 'pendiente');
         $observaciones = trim($_POST['observaciones'] ?? '');
-        $actividadesIds = isset($_POST['actividades']) && is_array($_POST['actividades'])
-            ? array_map('intval', $_POST['actividades'])
-            : array();
+        // Las actividades llegan como un arreglo de checkbox marcados.
+        // Se recorren una por una y se convierten a numero entero por seguridad.
+        $actividadesIds = array();
+        if (isset($_POST['actividades']) && is_array($_POST['actividades'])) {
+            foreach ($_POST['actividades'] as $idActividad) {
+                $actividadesIds[] = (int) $idActividad;
+            }
+        }
 
         try {
             if ($idUsuario <= 0 || $idHotel <= 0) {
