@@ -46,7 +46,7 @@
                     <td><span class="estado <?php echo (int) $destino['estado'] === 1 ? 'estado--activo' : 'estado--inactivo'; ?>"><?php echo (int) $destino['estado'] === 1 ? 'Activo' : 'Inactivo'; ?></span></td>
                     <td class="acciones">
                         <a href="<?php echo BASE_URL; ?>/admin_destinos.php?accion=editar&id=<?php echo (int) $destino['id_destino']; ?>">Editar</a>
-                        <form method="post" action="<?php echo BASE_URL; ?>/admin_destinos.php?accion=eliminar">
+                        <form method="post" action="<?php echo BASE_URL; ?>/admin_destinos.php?accion=eliminar" onsubmit="return confirm('Seguro que deseas desactivar este destino?');">
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES); ?>">
                             <input type="hidden" name="id_destino" value="<?php echo (int) $destino['id_destino']; ?>">
                             <button type="submit">Desactivar</button>

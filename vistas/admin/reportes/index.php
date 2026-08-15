@@ -132,9 +132,16 @@ $datosGraficos = array(
 </section>
 
 <!-- Barra de busqueda funcional por JavaScript. -->
-<section class="filtros reporte-filtros">
-    <input type="search" id="buscadorReportes" placeholder="Filtrar tablas de reportes">
-    <button class="boton boton--compacto" type="button" id="limpiarReportes">Limpiar</button>
+<!-- Buscador que filtra en vivo las filas de las seis tablas de abajo.
+     Trabaja solo con JavaScript, sin recargar la pagina. -->
+<section class="reporte-filtros">
+    <div class="campo">
+        <label for="buscadorReportes">Buscar dentro de los reportes</label>
+        <input type="search" id="buscadorReportes"
+               placeholder="Ej: La Fortuna, confirmada, 2026-08...">
+        <small>Escribe para filtrar las filas de las tablas. Se buscan todas las columnas.</small>
+    </div>
+    <button class="boton boton--compacto" type="button" id="limpiarReportes">Limpiar filtro</button>
 </section>
 
 <!-- Graficos generados con JavaScript nativo. -->

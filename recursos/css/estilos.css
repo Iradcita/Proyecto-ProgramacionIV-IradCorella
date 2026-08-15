@@ -171,27 +171,42 @@ body {
    BOTONES
    -------------------------------------------------------------------------- */
 
+/* Estilo base de TODOS los botones.
+   Por defecto se ven como una pastilla blanca con borde rosado
+   (boton secundario). Asi ningun boton queda sin estilo. */
 .boton {
     display: inline-block;
     width: 100%;
     padding: 0.72rem 1rem;
-    border: none;
+    border: 2px solid var(--color-borde);
     border-radius: 999px; /* boton tipo pastilla */
+    background-color: #fff;
+    color: var(--color-primario-oscuro);
     font-size: 1rem;
     font-family: inherit;
     font-weight: 700;
     cursor: pointer;
     text-align: center;
+    text-decoration: none;
 }
 
+.boton:hover {
+    border-color: var(--color-primario);
+    background-color: var(--color-primario-suave);
+}
+
+/* Boton principal: el de la accion mas importante de cada pantalla. */
 .boton--primario {
+    border-color: transparent;
     background: linear-gradient(90deg, var(--color-primario), var(--color-secundario));
     color: #fff;
     box-shadow: var(--sombra-suave);
 }
 
 .boton--primario:hover {
+    border-color: transparent;
     background: var(--color-primario-oscuro);
+    color: #fff;
 }
 
 .boton--compacto {
@@ -437,16 +452,21 @@ body {
     font-weight: 700;
 }
 
+/* Estados "buenos": se pintan en verde.
+   Cubren los enum de usuarios, reservaciones y resenas. */
 .estado--activo,
 .estado--confirmada,
-.estado--completada {
+.estado--completada,
+.estado--aprobada {
     background: var(--color-exito-fondo);
     color: var(--color-exito);
 }
 
+/* Estados "negativos": se pintan en rojo. */
 .estado--inactivo,
 .estado--bloqueado,
-.estado--cancelada {
+.estado--cancelada,
+.estado--rechazada {
     background: var(--color-error-fondo);
     color: var(--color-error);
 }
@@ -798,10 +818,28 @@ body {
 }
 
 .reporte-filtros {
-    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
     background: #fff;
     border: 2px solid var(--color-borde);
     border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+}
+
+/* El campo de busqueda crece para ocupar el espacio disponible. */
+.reporte-filtros .campo {
+    flex: 1 1 260px;
+    margin-bottom: 0;
+}
+
+/* Mensaje que aparece dentro de una tabla cuando el filtro no encuentra nada. */
+.sin-resultados td {
+    text-align: center;
+    color: #8d7280;
+    font-style: italic;
 }
 
 .acciones-reportes {

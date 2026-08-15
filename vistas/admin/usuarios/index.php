@@ -42,7 +42,7 @@
                     <td><?php echo htmlspecialchars($usuario['fecha_registro'], ENT_QUOTES); ?></td>
                     <td class="acciones">
                         <a href="<?php echo BASE_URL; ?>/admin_usuarios.php?accion=editar&id=<?php echo (int) $usuario['id_usuario']; ?>">Editar</a>
-                        <form method="post" action="<?php echo BASE_URL; ?>/admin_usuarios.php?accion=eliminar">
+                        <form method="post" action="<?php echo BASE_URL; ?>/admin_usuarios.php?accion=eliminar" onsubmit="return confirm('Seguro que deseas desactivar este usuario?');">
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES); ?>">
                             <input type="hidden" name="id_usuario" value="<?php echo (int) $usuario['id_usuario']; ?>">
                             <button type="submit">Desactivar</button>
