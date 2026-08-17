@@ -53,7 +53,7 @@ $fotoPerfil = !empty($usuario['foto_url']) ? BASE_URL . '/' . $usuario['foto_url
                 </div>
                 <div class="campo">
                     <label for="telefono">Telefono</label>
-                    <input type="text" id="telefono" name="telefono" maxlength="25" value="<?php echo htmlspecialchars($usuario['telefono'] ?? '', ENT_QUOTES); ?>">
+                    <input type="tel" id="telefono" name="telefono" maxlength="25" pattern="(\+506[ -]?)?[245678][0-9]{3}[ -]?[0-9]{4}" title="Debe tener 8 digitos y empezar con 2, 4, 5, 6, 7 u 8. Ejemplo: 8888-7777" placeholder="8888-7777" value="<?php echo htmlspecialchars($usuario['telefono'] ?? '', ENT_QUOTES); ?>">
                 </div>
             </div>
             <button class="boton boton--primario" type="submit">Guardar datos</button>

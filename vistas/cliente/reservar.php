@@ -34,7 +34,9 @@
                 <select id="id_hotel" name="id_hotel" required>
                     <option value="">Seleccione</option>
                     <?php foreach ($hoteles as $hotel): ?>
-                        <option value="<?php echo (int) $hotel['id_hotel']; ?>" <?php echo (int) $hotelPreseleccionado === (int) $hotel['id_hotel'] ? 'selected' : ''; ?>>
+                        <option value="<?php echo (int) $hotel['id_hotel']; ?>"
+                                data-destino="<?php echo (int) $hotel['id_destino']; ?>"
+                                <?php echo (int) $hotelPreseleccionado === (int) $hotel['id_hotel'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($hotel['destino_nombre'] . ' - ' . $hotel['nombre'] . ' (CRC ' . number_format((float) $hotel['precio_noche'], 2) . ' por noche)', ENT_QUOTES); ?>
                         </option>
                     <?php endforeach; ?>
@@ -61,9 +63,10 @@
             </div>
             <div class="campo campo--ancho">
                 <label>Actividades opcionales</label>
+                <small>Solo se muestran las actividades del mismo destino que el hotel elegido.</small>
                 <div class="checkbox-lista">
                     <?php foreach ($actividades as $actividad): ?>
-                        <label>
+                        <label data-destino="<?php echo (int) $actividad['id_destino']; ?>">
                             <input type="checkbox" name="actividades[]" value="<?php echo (int) $actividad['id_actividad']; ?>">
                             <?php echo htmlspecialchars($actividad['destino_nombre'] . ' - ' . $actividad['nombre'] . ' (CRC ' . number_format((float) $actividad['precio'], 2) . ')', ENT_QUOTES); ?>
                         </label>
@@ -71,6 +74,8 @@
                     <?php if (empty($actividades)): ?>
                         <p>No hay actividades disponibles para el filtro actual.</p>
                     <?php endif; ?>
+                    <!-- Aviso que muestra el JavaScript si el destino elegido no tiene actividades -->
+                    <p id="avisoSinActividades" hidden>Este destino todavia no tiene actividades disponibles.</p>
                 </div>
             </div>
             <div class="campo campo--ancho">
@@ -82,5 +87,7 @@
         <button class="boton boton--primario" type="submit">Confirmar solicitud</button>
     </form>
 </section>
+
+<script src="<?php echo RECURSOS_URL; ?>/js/reservar.js"></script>
 
 <?php require BASE_PATH . '/vistas/layouts/footer.php'; ?>

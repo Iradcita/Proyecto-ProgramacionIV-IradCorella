@@ -29,7 +29,7 @@
 
         <div class="campo">
             <label for="telefono">Teléfono (opcional)</label>
-            <input type="tel" id="telefono" name="telefono" maxlength="25"
+            <input type="tel" id="telefono" name="telefono" maxlength="25" pattern="(\+506[ -]?)?[245678][0-9]{3}[ -]?[0-9]{4}" title="Debe tener 8 digitos y empezar con 2, 4, 5, 6, 7 u 8. Ejemplo: 8888-7777" placeholder="8888-7777"
                    value="<?php echo htmlspecialchars($valores['telefono'] ?? '', ENT_QUOTES); ?>">
         </div>
 

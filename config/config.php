@@ -100,6 +100,7 @@ require_once BASE_PATH . '/modelos/Resena.php';
 require_once BASE_PATH . '/servicios/AuthService.php';
 require_once BASE_PATH . '/servicios/ApiService.php';
 require_once BASE_PATH . '/servicios/LoggerService.php';
+require_once BASE_PATH . '/servicios/ImagenService.php';
 
 // --- Controladores: uno por cada modulo del sistema ---
 require_once BASE_PATH . '/controladores/AuthController.php';

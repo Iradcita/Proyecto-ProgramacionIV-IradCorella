@@ -77,7 +77,10 @@ class AdminHotelController
         $precioNoche = trim($_POST['precio_noche'] ?? '');
         $cantidadHabitaciones = obtenerEntero($_POST['cantidad_habitaciones'] ?? 0);
         $descripcion = trim($_POST['descripcion'] ?? '');
-        $imagen = trim($_POST['imagen'] ?? '');
+        // La imagen ya no se escribe a mano: se sube como archivo.
+        // Aqui se guarda la que el registro ya tenia, y mas abajo se cambia
+        // solo si el administrador subio una nueva o pidio quitarla.
+        $imagen = trim($_POST['imagen_actual'] ?? '');
         $estado = obtenerEntero($_POST['estado'] ?? 1);
 
         try {
@@ -97,8 +100,26 @@ class AdminHotelController
                 throw new Exception('La cantidad de habitaciones debe ser positiva.');
             }
 
+            if ($telefono !== '' && !telefonoEsValido($telefono)) {
+                throw new Exception('El telefono del hotel debe tener 8 digitos. Ejemplo: 2222-3333.');
+            }
+
             if ($correo !== '' && !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
                 throw new Exception('El correo del hotel no es valido.');
+            }
+
+
+            // Caso 1: marco la casilla para quitar la imagen actual.
+            if (!empty($_POST['quitar_imagen'])) {
+                ImagenService::eliminar($imagen);
+                $imagen = '';
+            }
+
+            // Caso 2: escogio un archivo nuevo. Se sube y se borra el anterior.
+            if (ImagenService::seSubioArchivo($_FILES['imagen_archivo'] ?? null)) {
+                $imagenAnterior = $imagen;
+                $imagen = ImagenService::guardar($_FILES['imagen_archivo'], 'hoteles', 'hotel');
+                ImagenService::eliminar($imagenAnterior);
             }
 
             if ($idHotel > 0) {

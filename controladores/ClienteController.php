@@ -167,6 +167,28 @@ class ClienteController
                 throw new Exception('Personas y habitaciones deben ser valores positivos.');
             }
 
+            // Las actividades deben ser del MISMO destino que el hotel elegido.
+            // No tiene sentido reservar un hotel en La Fortuna y una actividad
+            // en Puerto Viejo. El formulario ya lo filtra con JavaScript, pero
+            // se vuelve a revisar aqui porque el JavaScript se puede desactivar.
+            $hotelElegido = Hotel::obtenerActivoPorId($idHotel);
+
+            if (!$hotelElegido) {
+                throw new Exception('El hotel seleccionado no esta disponible.');
+            }
+
+            foreach ($actividadesIds as $idActividad) {
+                $actividad = Actividad::obtenerActivaPorId($idActividad);
+
+                if (!$actividad) {
+                    throw new Exception('Una de las actividades seleccionadas no esta disponible.');
+                }
+
+                if ((int) $actividad['id_destino'] !== (int) $hotelElegido['id_destino']) {
+                    throw new Exception('Las actividades deben ser del mismo destino que el hotel elegido.');
+                }
+            }
+
             $actividadesIds = array_values(array_unique($actividadesIds));
             $idReservacion = Reservacion::crearCompleta($idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, 'pendiente', $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds);
             registrarBitacora('CREAR_RESERVACION_CLIENTE', 'reservaciones', $idReservacion);
@@ -291,6 +313,11 @@ class ClienteController
                 throw new Exception('El correo electronico no es valido.');
             }
 
+            // El telefono es opcional, pero si se escribe debe tener formato valido.
+            if ($telefono !== '' && !telefonoEsValido($telefono)) {
+                throw new Exception('El telefono debe tener 8 digitos. Ejemplo: 8888-7777.');
+            }
+
             $usuarioExistente = Usuario::buscarPorCorreo($correo);
             if ($usuarioExistente && (int) $usuarioExistente['id_usuario'] !== $idUsuario) {
                 throw new Exception('Ese correo ya esta registrado.');
@@ -343,6 +370,9 @@ class ClienteController
     }
 
     // Sube una nueva fotografia o elimina la fotografia actual.
+    // Sube o elimina la fotografia del perfil.
+    // Usa el mismo ImagenService que destinos, hoteles y actividades,
+    // para que todas las imagenes del sistema se manejen igual.
     public function guardarFoto()
     {
         exigirAutenticacion();
@@ -351,8 +381,12 @@ class ClienteController
         $idUsuario = obtenerEntero($_SESSION['usuario']['id_usuario'] ?? 0);
 
         try {
+            $usuario = Usuario::obtenerPorId($idUsuario);
+            $fotoActual = $usuario ? $usuario['foto_url'] : '';
+
+            // Opcion 1: el usuario pidio borrar su fotografia.
             if (!empty($_POST['eliminar_foto'])) {
-                $this->eliminarArchivoFotoActual($idUsuario);
+                ImagenService::eliminar($fotoActual);
                 Usuario::actualizarFoto($idUsuario, null);
                 $this->actualizarSesionPerfil($idUsuario);
                 registrarBitacora('ELIMINAR_FOTO_PERFIL', 'usuarios', $idUsuario);
@@ -360,39 +394,17 @@ class ClienteController
                 $this->redirigir('/perfil.php');
             }
 
-            if (empty($_FILES['foto']['name'])) {
+            // Opcion 2: subio una fotografia nueva.
+            if (!ImagenService::seSubioArchivo($_FILES['foto'] ?? null)) {
                 throw new Exception('Debes seleccionar una fotografia.');
             }
 
-            if ($_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
-                throw new Exception('No se pudo subir la fotografia.');
-            }
+            $nuevaFoto = ImagenService::guardar($_FILES['foto'], 'perfiles', 'usuario_' . $idUsuario);
 
-            if ($_FILES['foto']['size'] > 2097152) {
-                throw new Exception('La fotografia no debe superar 2 MB.');
-            }
+            // Ya que se guardo la nueva, se borra la anterior del disco.
+            ImagenService::eliminar($fotoActual);
 
-            $mime = $this->obtenerMimeArchivo($_FILES['foto']['tmp_name']);
-            $extensiones = array('image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp');
-
-            if (!isset($extensiones[$mime])) {
-                throw new Exception('Solo se permiten imagenes JPG, PNG o WEBP.');
-            }
-
-            $directorio = BASE_PATH . '/public/uploads/perfiles';
-            if (!is_dir($directorio)) {
-                mkdir($directorio, 0775, true);
-            }
-
-            $nombreArchivo = 'usuario_' . $idUsuario . '_' . time() . '.' . $extensiones[$mime];
-            $rutaDestino = $directorio . '/' . $nombreArchivo;
-
-            if (!move_uploaded_file($_FILES['foto']['tmp_name'], $rutaDestino)) {
-                throw new Exception('No se pudo guardar la fotografia.');
-            }
-
-            $this->eliminarArchivoFotoActual($idUsuario);
-            Usuario::actualizarFoto($idUsuario, 'uploads/perfiles/' . $nombreArchivo);
+            Usuario::actualizarFoto($idUsuario, $nuevaFoto);
             $this->actualizarSesionPerfil($idUsuario);
             registrarBitacora('ACTUALIZAR_FOTO_PERFIL', 'usuarios', $idUsuario);
             guardarMensaje('exito', 'Fotografia actualizada correctamente.');
@@ -450,43 +462,7 @@ class ClienteController
         $_SESSION['usuario']['rol_nombre'] = $usuario['rol_nombre'];
     }
 
-    // Detecta el tipo real del archivo subido.
-    private function obtenerMimeArchivo($rutaTemporal)
-    {
-        if (function_exists('finfo_open')) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = finfo_file($finfo, $rutaTemporal);
-            finfo_close($finfo);
 
-            return $mime;
-        }
-
-        if (function_exists('mime_content_type')) {
-            return mime_content_type($rutaTemporal);
-        }
-
-        return '';
-    }
-
-    // Elimina del disco la foto local anterior si pertenece a la carpeta permitida.
-    private function eliminarArchivoFotoActual($idUsuario)
-    {
-        $usuario = Usuario::obtenerPorId($idUsuario);
-
-        if (!$usuario || empty($usuario['foto_url'])) {
-            return;
-        }
-
-        if (strpos($usuario['foto_url'], 'uploads/perfiles/') !== 0) {
-            return;
-        }
-
-        $ruta = BASE_PATH . '/public/' . $usuario['foto_url'];
-
-        if (is_file($ruta)) {
-            unlink($ruta);
-        }
-    }
 
     // Redirige dentro de la carpeta publica del proyecto.
     private function redirigir($ruta)

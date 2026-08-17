@@ -18,7 +18,7 @@ $accionFormulario = BASE_URL . '/admin_destinos.php?accion=guardar';
 
     <?php require BASE_PATH . '/vistas/layouts/mensajes.php'; ?>
 
-    <form method="post" action="<?php echo $accionFormulario; ?>">
+    <form method="post" action="<?php echo $accionFormulario; ?>" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES); ?>">
         <input type="hidden" name="id_destino" value="<?php echo $editando ? (int) $destino['id_destino'] : 0; ?>">
 
@@ -42,9 +42,28 @@ $accionFormulario = BASE_URL . '/admin_destinos.php?accion=guardar';
                 <label for="descripcion">Descripcion</label>
                 <textarea id="descripcion" name="descripcion" maxlength="1000" required><?php echo htmlspecialchars($destino['descripcion'] ?? '', ENT_QUOTES); ?></textarea>
             </div>
-            <div class="campo">
-                <label for="imagen_principal">Imagen principal</label>
-                <input type="text" id="imagen_principal" name="imagen_principal" maxlength="500" value="<?php echo htmlspecialchars($destino['imagen_principal'] ?? '', ENT_QUOTES); ?>">
+            <div class="campo campo--ancho">
+                <label for="imagen_archivo">Imagen principal</label>
+
+                <?php if (!empty($destino['imagen_principal'])): ?>
+                    <!-- Vista previa de la imagen que ya tiene guardada -->
+                    <div class="imagen-actual">
+                        <img src="<?php echo BASE_URL . '/' . htmlspecialchars($destino['imagen_principal'], ENT_QUOTES); ?>"
+                             alt="Imagen actual"
+                             onerror="this.style.display='none';">
+                        <label class="check-linea">
+                            <input type="checkbox" name="quitar_imagen" value="1">
+                            Quitar la imagen actual
+                        </label>
+                    </div>
+                <?php endif; ?>
+
+                <input type="file" id="imagen_archivo" name="imagen_archivo" accept="image/jpeg,image/png,image/webp">
+                <small>Formatos permitidos: JPG, PNG o WEBP. Peso maximo: 2 MB.
+                       Si no escoges ninguna, se conserva la que ya estaba.</small>
+
+                <!-- Se manda la ruta actual escondida para no perderla al guardar -->
+                <input type="hidden" name="imagen_actual" value="<?php echo htmlspecialchars($destino['imagen_principal'] ?? '', ENT_QUOTES); ?>">
             </div>
             <div class="campo">
                 <label for="estado">Estado</label>
