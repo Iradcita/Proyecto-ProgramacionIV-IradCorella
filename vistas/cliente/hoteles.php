@@ -37,7 +37,7 @@
         <article class="catalogo-item">
             <div class="catalogo-item__media">
                 <?php if (!empty($hotel['imagen'])): ?>
-                    <img src="<?php echo htmlspecialchars($hotel['imagen'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($hotel['nombre'], ENT_QUOTES); ?>">
+                    <img onerror="this.style.display='none';" src="<?php echo htmlspecialchars($hotel['imagen'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($hotel['nombre'], ENT_QUOTES); ?>">
                 <?php else: ?>
                     <span><?php echo htmlspecialchars(substr($hotel['nombre'], 0, 1), ENT_QUOTES); ?></span>
                 <?php endif; ?>

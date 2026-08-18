@@ -1,28 +1,52 @@
+/* ==========================================================================
+   Hoja de estilos de NubeTurismo
+   Tema rosado ("pinky") para que el sistema se vea alegre y amigable.
+   Todo el diseno se hizo con CSS puro (sin frameworks) usando:
+   - Variables de color en :root para no repetir los codigos hexadecimales.
+   - Flexbox y Grid para acomodar las secciones.
+   - Media queries al final para que se vea bien en celular (responsive).
+   ========================================================================== */
+
+/* Variables globales: si quiero cambiar el color del sistema completo,
+   solo modifico estos valores y se actualiza toda la pagina. */
 :root {
-    --color-primario: #0d6e6e;
-    --color-primario-oscuro: #094f4f;
-    --color-texto: #1f2933;
-    --color-fondo: #f4f7f7;
-    --color-borde: #d7dee0;
-    --color-error: #b3261e;
-    --color-error-fondo: #fceceb;
-    --color-exito: #1e6b3c;
-    --color-exito-fondo: #e7f5ec;
+    --color-primario: #e0578f;          /* rosa principal (botones, titulos) */
+    --color-primario-oscuro: #c23c74;   /* rosa mas oscuro para el hover */
+    --color-primario-suave: #ffe4ef;    /* rosa clarito para fondos suaves */
+    --color-secundario: #a06cd5;        /* morado para detalles y degradados */
+    --color-texto: #4a3340;             /* cafe/morado oscuro, mas suave que negro */
+    --color-fondo: #fff5f9;             /* fondo general rosita muy claro */
+    --color-borde: #f6d3e2;             /* bordes rosados */
+    --color-error: #c62368;
+    --color-error-fondo: #ffe3ee;
+    --color-exito: #2f8f6d;
+    --color-exito-fondo: #e2f7ef;
+    --sombra-suave: 0 6px 18px rgba(224, 87, 143, 0.12); /* sombrita rosada */
+    --radio: 18px;                      /* esquinas redondeadas = look "cute" */
 }
 
+/* border-box hace que el padding no aumente el ancho de las cajas.
+   Sin esto los formularios se salen del contenedor. */
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
+    /* Quicksand es una tipografia redondeada; si no carga se usan las de respaldo */
+    font-family: "Quicksand", "Segoe UI", Arial, sans-serif;
     background-color: var(--color-fondo);
     color: var(--color-texto);
 }
 
+/* --------------------------------------------------------------------------
+   CABECERA Y NAVEGACION
+   -------------------------------------------------------------------------- */
+
 .cabecera {
-    background-color: var(--color-primario);
+    /* Degradado rosa -> morado para que la barra superior se vea bonita */
+    background: linear-gradient(90deg, var(--color-primario), var(--color-secundario));
+    box-shadow: var(--sombra-suave);
 }
 
 .cabecera__contenedor {
@@ -38,28 +62,37 @@ body {
 
 .cabecera__marca {
     color: #fff;
-    font-weight: 700;
-    font-size: 1.25rem;
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: 0.5px;
     text-decoration: none;
 }
 
 .cabecera__nav {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.4rem;
 }
 
 .cabecera__nav a {
     color: #fff;
     text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px; /* pildoras redondeadas en el menu */
 }
 
+/* Fondo semitransparente al pasar el mouse, en vez de solo subrayado */
 .cabecera__nav a:hover {
-    text-decoration: underline;
+    background-color: rgba(255, 255, 255, 0.22);
 }
 
 .cabecera__saludo {
-    color: #eaf6f6;
+    color: #fff0f6;
+    font-size: 0.92rem;
+    font-weight: 600;
 }
 
 .contenido {
@@ -68,18 +101,24 @@ body {
     padding: 2rem 1.5rem;
 }
 
+/* --------------------------------------------------------------------------
+   FORMULARIOS (login, registro, mantenimientos)
+   -------------------------------------------------------------------------- */
+
 .formulario-contenedor {
-    max-width: 420px;
+    max-width: 440px;
     margin: 0 auto;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 10px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
     padding: 2rem;
+    box-shadow: var(--sombra-suave);
 }
 
 .formulario-contenedor h1 {
     margin-top: 0;
     font-size: 1.5rem;
+    color: var(--color-primario-oscuro);
 }
 
 .campo {
@@ -90,7 +129,7 @@ body {
 }
 
 .campo label {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.9rem;
 }
 
@@ -99,11 +138,12 @@ body {
 .campo textarea,
 .filtros input,
 .filtros select {
-    padding: 0.6rem 0.75rem;
-    border: 1px solid var(--color-borde);
-    border-radius: 6px;
+    padding: 0.65rem 0.8rem;
+    border: 2px solid var(--color-borde);
+    border-radius: 12px;
     font-size: 1rem;
     font-family: inherit;
+    background-color: #fffafc;
 }
 
 .campo textarea {
@@ -111,6 +151,7 @@ body {
     resize: vertical;
 }
 
+/* Al hacer clic en un campo se marca con un anillo rosado */
 .campo input:focus,
 .campo select:focus,
 .campo textarea:focus,
@@ -118,38 +159,44 @@ body {
 .filtros select:focus {
     outline: none;
     border-color: var(--color-primario);
-    box-shadow: 0 0 0 3px rgba(13, 110, 110, 0.15);
+    box-shadow: 0 0 0 4px rgba(224, 87, 143, 0.18);
 }
 
 .campo small {
-    color: #5b6b73;
+    color: #8d7280;
     font-size: 0.8rem;
 }
+
+/* --------------------------------------------------------------------------
+   BOTONES
+   -------------------------------------------------------------------------- */
 
 .boton {
     display: inline-block;
     width: 100%;
-    padding: 0.7rem 1rem;
+    padding: 0.72rem 1rem;
     border: none;
-    border-radius: 6px;
+    border-radius: 999px; /* boton tipo pastilla */
     font-size: 1rem;
-    font-weight: 600;
+    font-family: inherit;
+    font-weight: 700;
     cursor: pointer;
     text-align: center;
 }
 
 .boton--primario {
-    background-color: var(--color-primario);
+    background: linear-gradient(90deg, var(--color-primario), var(--color-secundario));
     color: #fff;
+    box-shadow: var(--sombra-suave);
 }
 
 .boton--primario:hover {
-    background-color: var(--color-primario-oscuro);
+    background: var(--color-primario-oscuro);
 }
 
 .boton--compacto {
     width: auto;
-    padding: 0.55rem 0.9rem;
+    padding: 0.55rem 1.1rem;
     text-decoration: none;
 }
 
@@ -161,16 +208,22 @@ body {
 
 .enlace-secundario a {
     color: var(--color-primario);
+    font-weight: 700;
 }
 
+/* Caja donde se muestra el enlace de recuperacion simulado */
 .enlace-simulado {
     font-size: 0.85rem;
-    background: #f0f6f6;
-    border: 1px dashed var(--color-borde);
-    border-radius: 6px;
+    background: var(--color-primario-suave);
+    border: 2px dashed var(--color-primario);
+    border-radius: 12px;
     padding: 0.75rem;
     word-break: break-all;
 }
+
+/* --------------------------------------------------------------------------
+   MENSAJES DE EXITO Y ERROR
+   -------------------------------------------------------------------------- */
 
 .mensajes {
     margin-bottom: 1.25rem;
@@ -180,30 +233,42 @@ body {
 }
 
 .mensaje {
-    padding: 0.65rem 0.9rem;
-    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
     font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .mensaje--error {
     background-color: var(--color-error-fondo);
     color: var(--color-error);
-    border: 1px solid rgba(179, 38, 30, 0.25);
+    border: 2px solid rgba(198, 35, 104, 0.25);
 }
 
 .mensaje--exito {
     background-color: var(--color-exito-fondo);
     color: var(--color-exito);
-    border: 1px solid rgba(30, 107, 60, 0.25);
+    border: 2px solid rgba(47, 143, 109, 0.25);
 }
+
+/* --------------------------------------------------------------------------
+   PANEL DE INICIO Y TARJETAS DE ACCESO
+   -------------------------------------------------------------------------- */
 
 .panel-bienvenida {
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 10px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
     padding: 2rem;
+    box-shadow: var(--sombra-suave);
 }
 
+.panel-bienvenida h1 {
+    margin-top: 0;
+    color: var(--color-primario-oscuro);
+}
+
+/* auto-fit + minmax acomoda solo las tarjetas segun el ancho de la pantalla */
 .admin-tarjetas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -215,20 +280,26 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    padding: 1rem;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
-    background: #f9fbfb;
+    padding: 1.1rem;
+    border: 2px solid var(--color-borde);
+    border-radius: 14px;
+    background: var(--color-primario-suave);
     color: var(--color-texto);
     text-decoration: none;
 }
 
+/* Se resalta la tarjeta al pasar el mouse */
 .admin-tarjetas a:hover {
     border-color: var(--color-primario);
+    box-shadow: var(--sombra-suave);
+}
+
+.admin-tarjetas strong {
+    color: var(--color-primario-oscuro);
 }
 
 .admin-tarjetas span {
-    color: #5b6b73;
+    color: #8d7280;
     font-size: 0.9rem;
 }
 
@@ -240,14 +311,20 @@ body {
     margin-bottom: 1.25rem;
 }
 
-.admin-encabezado h1 {
+.admin-encabezado h1,
+.admin-encabezado h2 {
     margin: 0 0 0.25rem;
+    color: var(--color-primario-oscuro);
 }
 
 .admin-encabezado p {
     margin: 0;
-    color: #5b6b73;
+    color: #8d7280;
 }
+
+/* --------------------------------------------------------------------------
+   FILTROS Y TABLAS DE ADMINISTRACION
+   -------------------------------------------------------------------------- */
 
 .filtros {
     display: flex;
@@ -261,11 +338,13 @@ body {
     min-width: min(100%, 280px);
 }
 
+/* overflow-x permite deslizar la tabla en celulares sin romper la pagina */
 .tabla-contenedor {
     overflow-x: auto;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
 }
 
 .tabla-admin {
@@ -283,9 +362,15 @@ body {
 }
 
 .tabla-admin th {
-    background: #f1f6f6;
+    background: var(--color-primario-suave);
+    color: var(--color-primario-oscuro);
     font-size: 0.85rem;
     text-transform: uppercase;
+}
+
+/* Filas alternas en rosita muy claro para leer mejor */
+.tabla-admin tbody tr:nth-child(even) {
+    background: #fffafc;
 }
 
 .tabla-admin tr:last-child td {
@@ -293,7 +378,7 @@ body {
 }
 
 .tabla-admin small {
-    color: #5b6b73;
+    color: #8d7280;
 }
 
 .acciones {
@@ -310,30 +395,43 @@ body {
     border: none;
     padding: 0;
     font: inherit;
+    font-weight: 700;
     cursor: pointer;
     text-decoration: underline;
 }
 
 .formulario-admin {
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
     padding: 1.5rem;
+    box-shadow: var(--sombra-suave);
 }
 
+.formulario-admin h1,
+.formulario-admin h2 {
+    color: var(--color-primario-oscuro);
+}
+
+/* Formulario a dos columnas; en celular baja a una sola (ver media query) */
 .grid-formulario {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
 }
 
+/* Los campos largos (descripciones) ocupan las dos columnas */
 .campo--ancho {
     grid-column: 1 / -1;
 }
 
+/* --------------------------------------------------------------------------
+   ETIQUETAS DE ESTADO (activo, pendiente, cancelada, etc.)
+   -------------------------------------------------------------------------- */
+
 .estado {
     display: inline-block;
-    padding: 0.25rem 0.55rem;
+    padding: 0.28rem 0.7rem;
     border-radius: 999px;
     font-size: 0.8rem;
     font-weight: 700;
@@ -354,17 +452,17 @@ body {
 }
 
 .estado--pendiente {
-    background: #fff7d6;
-    color: #775600;
+    background: #fff3d6;
+    color: #9a6b00;
 }
 
 .checkbox-lista {
     display: grid;
     gap: 0.5rem;
-    padding: 0.75rem;
-    border: 1px solid var(--color-borde);
-    border-radius: 6px;
-    background: #f9fbfb;
+    padding: 0.85rem;
+    border: 2px solid var(--color-borde);
+    border-radius: 12px;
+    background: #fffafc;
 }
 
 .checkbox-lista label {
@@ -373,6 +471,10 @@ body {
     align-items: flex-start;
     font-weight: 400;
 }
+
+/* --------------------------------------------------------------------------
+   CATALOGO DE DESTINOS, HOTELES Y ACTIVIDADES
+   -------------------------------------------------------------------------- */
 
 .catalogo-grid {
     display: grid;
@@ -390,21 +492,24 @@ body {
     min-height: 180px;
     overflow: hidden;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
 }
 
+/* Si el registro no tiene imagen se muestra la inicial del nombre */
 .catalogo-item__media {
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 180px;
-    background: #e9f2f2;
+    background: var(--color-primario-suave);
     color: var(--color-primario);
     font-size: 3rem;
     font-weight: 800;
 }
 
+/* object-fit: cover recorta la foto sin deformarla */
 .catalogo-item__media img {
     width: 100%;
     height: 100%;
@@ -418,6 +523,7 @@ body {
 .catalogo-item__contenido h2,
 .catalogo-item__contenido h3 {
     margin: 0 0 0.4rem;
+    color: var(--color-primario-oscuro);
 }
 
 .catalogo-item__acciones {
@@ -433,8 +539,12 @@ body {
 }
 
 .texto-muted {
-    color: #5b6b73;
+    color: #8d7280;
 }
+
+/* --------------------------------------------------------------------------
+   DETALLE DE DESTINO
+   -------------------------------------------------------------------------- */
 
 .detalle-destino {
     display: grid;
@@ -444,12 +554,14 @@ body {
     margin-bottom: 1.5rem;
     padding: 1.5rem;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
 }
 
 .detalle-destino h1 {
     margin-top: 0;
+    color: var(--color-primario-oscuro);
 }
 
 .detalle-destino__imagen {
@@ -458,9 +570,9 @@ body {
     justify-content: center;
     min-height: 220px;
     overflow: hidden;
-    background: #e9f2f2;
+    background: var(--color-primario-suave);
     color: var(--color-primario);
-    border-radius: 8px;
+    border-radius: 14px;
     font-size: 4rem;
     font-weight: 800;
 }
@@ -475,6 +587,67 @@ body {
     margin-top: 1.5rem;
 }
 
+/* --------------------------------------------------------------------------
+   TARJETAS DE APIS EXTERNAS (clima y tipo de cambio)
+   -------------------------------------------------------------------------- */
+
+.tarjeta-api {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(120deg, var(--color-primario-suave), #f3e8ff);
+    border: 2px dashed var(--color-primario);
+    border-radius: var(--radio);
+}
+
+.tarjeta-api h2 {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-primario-oscuro);
+}
+
+.tarjeta-api article {
+    background: #fff;
+    border-radius: 14px;
+    padding: 0.9rem;
+}
+
+.tarjeta-api span {
+    display: block;
+    font-size: 0.85rem;
+    color: #8d7280;
+}
+
+.tarjeta-api strong {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 1.25rem;
+    color: var(--color-primario-oscuro);
+}
+
+/* Aviso que aparece cuando la API externa no responde */
+.tarjeta-api__aviso {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 0.88rem;
+    color: #8d7280;
+}
+
+/* Precio convertido a dolares que se muestra bajo el precio en colones */
+.precio-dolares {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-secundario);
+    font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   PERFIL DEL USUARIO
+   -------------------------------------------------------------------------- */
+
 .perfil-grid {
     display: grid;
     grid-template-columns: 280px minmax(0, 1fr);
@@ -485,11 +658,13 @@ body {
 .perfil-resumen {
     padding: 1.5rem;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
     text-align: center;
+    box-shadow: var(--sombra-suave);
 }
 
+/* border-radius: 50% convierte el cuadro de la foto en un circulo */
 .perfil-avatar {
     width: 120px;
     height: 120px;
@@ -499,7 +674,8 @@ body {
     justify-content: center;
     overflow: hidden;
     border-radius: 50%;
-    background: #e9f2f2;
+    border: 4px solid var(--color-primario-suave);
+    background: var(--color-primario-suave);
     color: var(--color-primario);
     font-size: 3rem;
     font-weight: 800;
@@ -513,6 +689,7 @@ body {
 
 .perfil-resumen h2 {
     margin: 0 0 0.25rem;
+    color: var(--color-primario-oscuro);
 }
 
 .perfil-paneles {
@@ -531,6 +708,10 @@ body {
     margin-bottom: 1rem;
 }
 
+/* --------------------------------------------------------------------------
+   DETALLE DE RESERVACION
+   -------------------------------------------------------------------------- */
+
 .detalle-reserva-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -540,13 +721,20 @@ body {
 .detalle-bloque {
     padding: 1.25rem;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
 }
 
-.detalle-bloque h2 {
+.detalle-bloque h2,
+.detalle-bloque h3 {
     margin-top: 0;
+    color: var(--color-primario-oscuro);
 }
+
+/* --------------------------------------------------------------------------
+   REPORTES Y GRAFICOS
+   -------------------------------------------------------------------------- */
 
 .reporte-resumen,
 .api-grid,
@@ -562,27 +750,47 @@ body {
 }
 
 .reporte-resumen article {
-    padding: 1rem;
+    padding: 1.1rem;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
 }
 
 .reporte-resumen span {
     display: block;
-    color: #5b6b73;
+    color: #8d7280;
     font-size: 0.85rem;
 }
 
 .reporte-resumen strong {
     display: block;
     margin-top: 0.35rem;
-    font-size: 1.4rem;
+    font-size: 1.45rem;
+    color: var(--color-primario-oscuro);
 }
 
 .api-grid,
 .graficos-grid {
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.api-grid article,
+.graficos-grid article {
+    padding: 1.1rem;
+    background: #fff;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra-suave);
+}
+
+.api-grid h2,
+.api-grid h3,
+.graficos-grid h2,
+.graficos-grid h3 {
+    margin-top: 0;
+    font-size: 1.05rem;
+    color: var(--color-primario-oscuro);
 }
 
 .reportes-tablas {
@@ -592,8 +800,8 @@ body {
 .reporte-filtros {
     padding: 1rem;
     background: #fff;
-    border: 1px solid var(--color-borde);
-    border-radius: 8px;
+    border: 2px solid var(--color-borde);
+    border-radius: var(--radio);
 }
 
 .acciones-reportes {
@@ -603,6 +811,7 @@ body {
     justify-content: flex-end;
 }
 
+/* Grafico de barras hecho a mano con divs (sin librerias externas) */
 .grafico-barras {
     display: grid;
     gap: 0.65rem;
@@ -619,36 +828,61 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #42545c;
+    color: #6d5560;
     font-size: 0.9rem;
 }
 
+/* Este div es la "pista" de fondo de la barra */
 .grafico-barras__fila div {
-    height: 14px;
+    height: 16px;
     overflow: hidden;
-    background: #e9f2f2;
+    background: var(--color-primario-suave);
     border-radius: 999px;
 }
 
+/* La etiqueta <i> es la barra de color; su ancho lo calcula el JavaScript */
 .grafico-barras__fila i {
     display: block;
     height: 100%;
-    background: var(--color-primario);
+    background: linear-gradient(90deg, var(--color-primario), var(--color-secundario));
     border-radius: inherit;
 }
 
 .grafico-barras__fila strong {
     text-align: right;
+    color: var(--color-primario-oscuro);
 }
 
 .pie {
     text-align: center;
     padding: 1.5rem;
-    color: #5b6b73;
+    color: #8d7280;
     font-size: 0.85rem;
 }
 
+/* --------------------------------------------------------------------------
+   RESPONSIVE: ajustes para tablet y celular
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .catalogo-item {
+        grid-template-columns: 120px 1fr;
+    }
+
+    .detalle-destino {
+        grid-template-columns: 1fr;
+    }
+
+    .perfil-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 480px) {
+    .contenido {
+        padding: 1.25rem 1rem;
+    }
+
     .formulario-contenedor {
         padding: 1.25rem;
     }
@@ -662,6 +896,7 @@ body {
         grid-template-columns: 1fr;
     }
 
+    /* En pantallas pequenas todo pasa a una sola columna */
     .catalogo-item,
     .detalle-destino {
         grid-template-columns: 1fr;

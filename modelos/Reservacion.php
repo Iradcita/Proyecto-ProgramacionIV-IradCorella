@@ -156,11 +156,22 @@ class Reservacion
     }
 
     // Crea una reservacion completa usando transaccion para mantener consistencia.
+    //
+    // Una reservacion se guarda en TRES tablas distintas:
+    //   1. reservaciones          -> los datos generales
+    //   2. reservacion_hotel      -> el hospedaje elegido
+    //   3. reservacion_actividad  -> cada actividad seleccionada
+    //
+    // Si se guardara una por una sin transaccion y fallara la tercera,
+    // quedaria una reservacion a medias (con hotel pero sin actividades).
+    // Con la transaccion las tres se confirman juntas con commit(), o si
+    // ocurre cualquier error se deshacen todas con rollBack().
     public static function crearCompleta($idUsuario, $fechaInicio, $fechaFin, $cantidadPersonas, $estado, $observaciones, $idHotel, $cantidadHabitaciones, $actividadesIds)
     {
         $conexion = Database::obtenerConexion();
 
         try {
+            // A partir de aqui nada se guarda de verdad hasta llegar al commit()
             $conexion->beginTransaction();
 
             $codigo = self::generarCodigo($conexion);
@@ -180,14 +191,19 @@ class Reservacion
             $stmt->bindParam(':observaciones', $observaciones);
             $stmt->execute();
 
+            // lastInsertId() devuelve el id que MySQL acaba de generar,
+            // y se necesita para relacionar las tablas hijas.
             $idReservacion = $conexion->lastInsertId();
             self::guardarHotel($idReservacion, $idHotel, $cantidadHabitaciones, $fechaInicio, $fechaFin);
             self::guardarActividades($idReservacion, $actividadesIds, $fechaInicio, $cantidadPersonas);
 
+            // Todo salio bien: se confirman los cambios de forma definitiva.
             $conexion->commit();
 
             return $idReservacion;
         } catch (Exception $e) {
+            // Algo fallo: se deshace todo para no dejar datos incompletos
+            // y se relanza el error para que el controlador avise al usuario.
             $conexion->rollBack();
             throw $e;
         }

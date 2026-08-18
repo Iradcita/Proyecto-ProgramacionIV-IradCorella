@@ -21,7 +21,7 @@ $fotoPerfil = !empty($usuario['foto_url']) ? BASE_URL . '/' . $usuario['foto_url
     <aside class="perfil-resumen">
         <div class="perfil-avatar">
             <?php if ($fotoPerfil !== ''): ?>
-                <img src="<?php echo htmlspecialchars($fotoPerfil, ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($usuario['nombre'], ENT_QUOTES); ?>">
+                <img onerror="this.style.display='none';" src="<?php echo htmlspecialchars($fotoPerfil, ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($usuario['nombre'], ENT_QUOTES); ?>">
             <?php else: ?>
                 <span><?php echo htmlspecialchars(substr($usuario['nombre'], 0, 1), ENT_QUOTES); ?></span>
             <?php endif; ?>

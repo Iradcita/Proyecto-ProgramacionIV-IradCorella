@@ -31,7 +31,7 @@
         <article class="catalogo-item">
             <div class="catalogo-item__media">
                 <?php if (!empty($actividad['imagen'])): ?>
-                    <img src="<?php echo htmlspecialchars($actividad['imagen'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($actividad['nombre'], ENT_QUOTES); ?>">
+                    <img onerror="this.style.display='none';" src="<?php echo htmlspecialchars($actividad['imagen'], ENT_QUOTES); ?>" alt="<?php echo htmlspecialchars($actividad['nombre'], ENT_QUOTES); ?>">
                 <?php else: ?>
                     <span><?php echo htmlspecialchars(substr($actividad['nombre'], 0, 1), ENT_QUOTES); ?></span>
                 <?php endif; ?>
