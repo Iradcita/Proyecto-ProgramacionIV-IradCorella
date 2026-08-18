@@ -63,7 +63,7 @@ CREATE TABLE `bitacora_acciones` (
   `tabla_afectada` varchar(100) DEFAULT NULL,
   `id_registro_afectado` int(11) DEFAULT NULL,
   `fecha` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `bitacora_acciones`
@@ -152,7 +152,7 @@ CREATE TABLE `password_resets` (
 CREATE TABLE `provincias` (
   `id_provincia` int(11) NOT NULL,
   `nombre` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `provincias`
@@ -299,7 +299,7 @@ CREATE TABLE `usuarios` (
   `password_hash` varchar(255) NOT NULL,
   `estado` enum('activo','inactivo','bloqueado') NOT NULL DEFAULT 'activo',
   `fecha_registro` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
