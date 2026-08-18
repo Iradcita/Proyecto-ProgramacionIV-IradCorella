@@ -50,7 +50,7 @@
                     <td><span class="estado <?php echo (int) $hotel['estado'] === 1 ? 'estado--activo' : 'estado--inactivo'; ?>"><?php echo (int) $hotel['estado'] === 1 ? 'Activo' : 'Inactivo'; ?></span></td>
                     <td class="acciones">
                         <a href="<?php echo BASE_URL; ?>/admin_hoteles.php?accion=editar&id=<?php echo (int) $hotel['id_hotel']; ?>">Editar</a>
-                        <form method="post" action="<?php echo BASE_URL; ?>/admin_hoteles.php?accion=eliminar">
+                        <form method="post" action="<?php echo BASE_URL; ?>/admin_hoteles.php?accion=eliminar" onsubmit="return confirm('Seguro que deseas desactivar este hotel?');">
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES); ?>">
                             <input type="hidden" name="id_hotel" value="<?php echo (int) $hotel['id_hotel']; ?>">
                             <button type="submit">Desactivar</button>
