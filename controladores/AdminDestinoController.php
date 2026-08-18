@@ -71,7 +71,10 @@ class AdminDestinoController
         $idProvincia = obtenerEntero($_POST['id_provincia'] ?? 0);
         $nombre = trim($_POST['nombre'] ?? '');
         $descripcion = trim($_POST['descripcion'] ?? '');
-        $imagen = trim($_POST['imagen_principal'] ?? '');
+        // La imagen ya no se escribe a mano: se sube como archivo.
+        // Aqui se guarda la que el registro ya tenia, y mas abajo se cambia
+        // solo si el administrador subio una nueva o pidio quitarla.
+        $imagen = trim($_POST['imagen_actual'] ?? '');
         $latitud = trim($_POST['latitud'] ?? '');
         $longitud = trim($_POST['longitud'] ?? '');
         $estado = obtenerEntero($_POST['estado'] ?? 1);
@@ -83,6 +86,19 @@ class AdminDestinoController
 
             $latitud = $latitud === '' ? null : $latitud;
             $longitud = $longitud === '' ? null : $longitud;
+
+            // Caso 1: marco la casilla para quitar la imagen actual.
+            if (!empty($_POST['quitar_imagen'])) {
+                ImagenService::eliminar($imagen);
+                $imagen = '';
+            }
+
+            // Caso 2: escogio un archivo nuevo. Se sube y se borra el anterior.
+            if (ImagenService::seSubioArchivo($_FILES['imagen_archivo'] ?? null)) {
+                $imagenAnterior = $imagen;
+                $imagen = ImagenService::guardar($_FILES['imagen_archivo'], 'destinos', 'destino');
+                ImagenService::eliminar($imagenAnterior);
+            }
 
             if ($idDestino > 0) {
                 Destino::actualizar($idDestino, $idProvincia, $nombre, $descripcion, $imagen, $latitud, $longitud, $estado);

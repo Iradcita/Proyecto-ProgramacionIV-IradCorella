@@ -17,7 +17,7 @@ $editando = !empty($actividad);
 
     <?php require BASE_PATH . '/vistas/layouts/mensajes.php'; ?>
 
-    <form method="post" action="<?php echo BASE_URL; ?>/admin_actividades.php?accion=guardar">
+    <form method="post" action="<?php echo BASE_URL; ?>/admin_actividades.php?accion=guardar" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken, ENT_QUOTES); ?>">
         <input type="hidden" name="id_actividad" value="<?php echo $editando ? (int) $actividad['id_actividad'] : 0; ?>">
 
@@ -61,8 +61,27 @@ $editando = !empty($actividad);
                 <textarea id="descripcion" name="descripcion" maxlength="1000" required><?php echo htmlspecialchars($actividad['descripcion'] ?? '', ENT_QUOTES); ?></textarea>
             </div>
             <div class="campo campo--ancho">
-                <label for="imagen">Imagen</label>
-                <input type="text" id="imagen" name="imagen" maxlength="500" value="<?php echo htmlspecialchars($actividad['imagen'] ?? '', ENT_QUOTES); ?>">
+                <label for="imagen_archivo">Imagen</label>
+
+                <?php if (!empty($actividad['imagen'])): ?>
+                    <!-- Vista previa de la imagen que ya tiene guardada -->
+                    <div class="imagen-actual">
+                        <img src="<?php echo BASE_URL . '/' . htmlspecialchars($actividad['imagen'], ENT_QUOTES); ?>"
+                             alt="Imagen actual"
+                             onerror="this.style.display='none';">
+                        <label class="check-linea">
+                            <input type="checkbox" name="quitar_imagen" value="1">
+                            Quitar la imagen actual
+                        </label>
+                    </div>
+                <?php endif; ?>
+
+                <input type="file" id="imagen_archivo" name="imagen_archivo" accept="image/jpeg,image/png,image/webp">
+                <small>Formatos permitidos: JPG, PNG o WEBP. Peso maximo: 2 MB.
+                       Si no escoges ninguna, se conserva la que ya estaba.</small>
+
+                <!-- Se manda la ruta actual escondida para no perderla al guardar -->
+                <input type="hidden" name="imagen_actual" value="<?php echo htmlspecialchars($actividad['imagen'] ?? '', ENT_QUOTES); ?>">
             </div>
         </div>
 

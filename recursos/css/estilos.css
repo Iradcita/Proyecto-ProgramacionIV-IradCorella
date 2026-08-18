@@ -721,6 +721,41 @@ body {
     margin-top: 0;
 }
 
+/* Vista previa de la imagen que ya tiene guardada un registro,
+   dentro de los formularios de destinos, hoteles y actividades. */
+.imagen-actual {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--color-primario-suave);
+    border: 2px solid var(--color-borde);
+    border-radius: 14px;
+}
+
+.imagen-actual img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* El campo para escoger archivo se separa un poco del resto. */
+.campo input[type="file"] {
+    padding: 0.5rem;
+    background-color: #fffafc;
+    border: 2px dashed var(--color-borde);
+    border-radius: 12px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.campo input[type="file"]:hover {
+    border-color: var(--color-primario);
+}
+
 .check-linea {
     display: flex;
     gap: 0.5rem;

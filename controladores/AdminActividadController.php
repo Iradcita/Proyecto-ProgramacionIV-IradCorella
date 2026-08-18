@@ -74,7 +74,10 @@ class AdminActividadController
         $precio = trim($_POST['precio'] ?? '');
         $duracionMinutos = obtenerEntero($_POST['duracion_minutos'] ?? 0);
         $cupoMaximo = obtenerEntero($_POST['cupo_maximo'] ?? 0);
-        $imagen = trim($_POST['imagen'] ?? '');
+        // La imagen ya no se escribe a mano: se sube como archivo.
+        // Aqui se guarda la que el registro ya tenia, y mas abajo se cambia
+        // solo si el administrador subio una nueva o pidio quitarla.
+        $imagen = trim($_POST['imagen_actual'] ?? '');
         $estado = obtenerEntero($_POST['estado'] ?? 1);
 
         try {
@@ -88,6 +91,20 @@ class AdminActividadController
 
             if ($duracionMinutos <= 0 || $cupoMaximo <= 0) {
                 throw new Exception('La duracion y el cupo deben ser positivos.');
+            }
+
+
+            // Caso 1: marco la casilla para quitar la imagen actual.
+            if (!empty($_POST['quitar_imagen'])) {
+                ImagenService::eliminar($imagen);
+                $imagen = '';
+            }
+
+            // Caso 2: escogio un archivo nuevo. Se sube y se borra el anterior.
+            if (ImagenService::seSubioArchivo($_FILES['imagen_archivo'] ?? null)) {
+                $imagenAnterior = $imagen;
+                $imagen = ImagenService::guardar($_FILES['imagen_archivo'], 'actividades', 'actividad');
+                ImagenService::eliminar($imagenAnterior);
             }
 
             if ($idActividad > 0) {

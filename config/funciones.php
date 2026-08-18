@@ -112,3 +112,33 @@ function cerrarSesion()
     $_SESSION = [];
     session_destroy();
 }
+
+/*
+   Valida un numero de telefono de Costa Rica.
+
+   Los telefonos de Costa Rica tienen 8 digitos y empiezan con
+   2 (fijo), 4 (VoIP) o 5, 6, 7, 8 (celular).
+
+   Se aceptan escritos de varias formas, porque la gente los anota distinto:
+       88887777        -> valido
+       8888-7777       -> valido
+       8888 7777       -> valido
+       +506 8888-7777  -> valido
+       123             -> invalido (muy corto)
+       abcd-efgh       -> invalido (no son numeros)
+
+   Devuelve true si el formato es correcto y false si no lo es.
+*/
+function telefonoEsValido($telefono)
+{
+    // Primero se quitan los separadores para trabajar solo con los numeros.
+    $limpio = str_replace(array(' ', '-', '(', ')'), '', trim($telefono));
+
+    // Si trae el codigo de pais de Costa Rica, se le quita.
+    if (strpos($limpio, '+506') === 0) {
+        $limpio = substr($limpio, 4);
+    }
+
+    // Al final deben quedar exactamente 8 digitos que empiecen con 2,4,5,6,7 u 8.
+    return preg_match('/^[245678][0-9]{7}$/', $limpio) === 1;
+}

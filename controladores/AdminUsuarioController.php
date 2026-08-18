@@ -84,6 +84,11 @@ class AdminUsuarioController
                 throw new Exception('El correo electronico no es valido.');
             }
 
+            // El telefono es opcional, pero si se escribe debe tener formato valido.
+            if ($telefono !== '' && !telefonoEsValido($telefono)) {
+                throw new Exception('El telefono debe tener 8 digitos. Ejemplo: 8888-7777.');
+            }
+
             if (!in_array($estado, array('activo', 'inactivo', 'bloqueado'), true)) {
                 throw new Exception('El estado seleccionado no es valido.');
             }
